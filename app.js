@@ -24,6 +24,8 @@ app.use(
   })
 );
 
+app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
+
 app.use('/', routerApi);
  
 mongoose.connect("mongodb://localhost:27017/xydy", {
