@@ -4,6 +4,7 @@ const router = express.Router();
 const film = require('../controller/front/film');
 const cinemaManage = require('../controller/back/cinema_manage');
 const filmManage = require('../controller/back/film_manage');
+const loginManage = require('../controller/back/login');
 
 /**
  **** 前台api
@@ -23,7 +24,7 @@ router.get("/api/getLocationCollege", film.getLocationCollege);
  */
 
 //登录
-router.post("/api/login", cinemaManage.login);
+router.post("/api/login", loginManage.login);
 //添加学校
 router.post("/api/addCollege", cinemaManage.addCollege);
 //搜索学校

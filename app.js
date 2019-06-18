@@ -8,7 +8,7 @@ const cinemaListTable = require("./models/cinema_list");
 const screenListTable = require("./models/screen_list");
 const sessionListTable = require("./models/session_list");
 const adminUserTable = require("./models/admin_user");
-let jwt = require("jsonwebtoken");
+let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
    
 app.use(
@@ -24,7 +24,28 @@ app.use(
   })
 );
 
+
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
+
+//登录拦截
+app.all('/*', function(req, res, next){
+  let getToken = req.headers['x-token'];
+
+  if(getToken == true){
+    jwt.verify(getToken, 'a1234', function(err, decoded) {
+      if(decoded){
+        next();
+      }else{
+        res.json({
+          code:20003,
+          'msg':'登录已过期'
+        });
+      }
+    });
+  }else{
+    next();
+  }
+})
 
 app.use('/', routerApi);
  
