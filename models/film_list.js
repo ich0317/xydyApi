@@ -10,7 +10,7 @@ const filmList = new mongoose.Schema({
     brief:String,   //简介
     country:String, //制作国家
     language:String,    //语言
-    release_date:String, //上映日期
+    release_date:Date, //上映日期
     film_version:String //影片版本
 });
 module.exports = mongoose.model('filmList', filmList);

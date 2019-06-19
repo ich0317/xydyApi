@@ -31,8 +31,9 @@ app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 app.all('/*', function(req, res, next){
   let getToken = req.headers['x-token'];
 
-  if(getToken == true){
+  if(!!getToken){
     jwt.verify(getToken, 'a1234', function(err, decoded) {
+      
       if(decoded){
         next();
       }else{
@@ -43,6 +44,7 @@ app.all('/*', function(req, res, next){
       }
     });
   }else{
+    console.log(2222);
     next();
   }
 })

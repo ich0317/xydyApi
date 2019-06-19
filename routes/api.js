@@ -6,6 +6,7 @@ const cinemaManage = require('../controller/back/cinema_manage');
 const filmManage = require('../controller/back/film_manage');
 const loginManage = require('../controller/back/login');
 const planManage = require('../controller/back/plan');
+const screenManage = require('../controller/back/screen');
 
 /**
  **** 前台api
@@ -48,5 +49,9 @@ router.get("/api/getFilmDetail", filmManage.getFilmDetail);
 router.post("/api/delFilm", filmManage.delFilm);
 //排期 搜索影片
 router.post("/api/searchFilm", planManage.searchFilm);
+//添加影厅
+router.post("/api/addScreen", screenManage.addScreen);
+//获取影厅
+router.post("/api/getScreen", screenManage.getScreen);
 
 module.exports = router;
