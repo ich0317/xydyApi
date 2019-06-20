@@ -53,5 +53,13 @@ router.post("/api/searchFilm", planManage.searchFilm);
 router.post("/api/addScreen", screenManage.addScreen);
 //获取影厅
 router.post("/api/getScreen", screenManage.getScreen);
+//添加座位
+router.post("/api/addSeat", screenManage.addSeat);
+//获取座位
+router.post("/api/getSeat", screenManage.getSeat);
+//添加排期
+router.post("/api/addSession", planManage.addSession);
+//获取排期
+router.post("/api/getSession", planManage.getSession);
 
 module.exports = router;

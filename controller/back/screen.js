@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const screenListTable = require("../../models/screen_list");
+const seatListTable = require("../../models/seat_list");
 
 //添加影厅
 exports.addScreen = (req, res, next) => {
@@ -36,9 +37,9 @@ exports.addScreen = (req, res, next) => {
   }
 };
 
-//获取影厅
-exports.getScreen = (req, res, next) => {
-  let { cinema_id } = req.body;
+//获取影厅及默认座位
+exports.getScreen = async (req, res, next) => {
+  let { cinema_id , _id} = req.body;
   if(!cinema_id){
     res.json({
       code:-1,
@@ -46,12 +47,60 @@ exports.getScreen = (req, res, next) => {
     });
     return;
   }
-  screenListTable.find({cinema_id},(err,data)=>{
+  const r = await screenListTable.find({cinema_id},(err,data)=>{
     if (err) return console.log(err);
     if(data.length == 0){
       res.json({
         code:1,
         msg:'获取成功',
+        data
+      });
+    }else{
+      return data;
+    }
+  });
+
+  seatListTable.find({screen_id:r[0]._id},(err,data)=>{
+    if (err) return console.log(err);
+    res.json({
+      code:0,
+      msg:'获取成功',
+      data:{
+        screen:r,
+        seat:data
+      }
+    });
+  });
+
+}
+
+//添加座位
+exports.addSeat = (req,res,err)=>{
+  let {seat} = req.body;
+  if(seat[0]._id){
+    //修改
+  }else{
+    //增加
+    seatListTable.insertMany(seat,(err,data)=>{
+      if (err) return console.log(err);
+      res.json({
+        code:0,
+        msg:'保存成功'
+      });
+    });
+  }
+}
+
+//获取座位
+exports.getSeat = (req,res,err)=>{
+  let { screen_id } = req.body;
+
+  seatListTable.find({screen_id},(err,data)=>{
+    if (err) return console.log(err);
+    if(data.length == 0){
+      res.json({
+        code:1,
+        msg:'暂无数据',
         data
       });
     }else{
