@@ -39,7 +39,7 @@ exports.addScreen = (req, res, next) => {
 
 //获取影厅及默认座位
 exports.getScreen = async (req, res, next) => {
-  let { cinema_id , _id} = req.body;
+  let { cinema_id , _id} = req.query;
   if(!cinema_id){
     res.json({
       code:-1,

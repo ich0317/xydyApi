@@ -29,7 +29,7 @@ exports.searchFilm = (req, res, next) => {
 
 //设置排期
 exports.addSession = (req, res, next) => {
-  
+  console.log(req.body);
   let { _id } = req.body;
   if(_id){
     //修改
@@ -48,9 +48,13 @@ exports.addSession = (req, res, next) => {
 
 //获取排期
 exports.getSession = (req, res, next) => {
-  let { cinema_id } = req.body;
-  
-  sessionListTable.find(req.body,(err,data)=>{
+  let { cinema_id, start_datetime } = req.query;
+  console.log(req.body);
+  sessionListTable.find({$and:[
+    {cinema_id},
+    {start_datetime:{$gte:`${start_datetime} 00:00`}},
+    {start_datetime:{$lte:`${start_datetime} 23:59`}}
+  ]},(err,data)=>{
     if (err) return console.log(err);
     if(data.length == 0){
       res.json({
@@ -65,6 +69,29 @@ exports.getSession = (req, res, next) => {
         data
       });
     }
-    
+  });
+}
+
+//删除排期
+exports.delSession = (req, res, next) => {
+  sessionListTable.deleteOne(req.body,(err,data)=>{
+    if (err) return console.log(err);
+      res.json({
+        code:0,
+        msg:'删除成功',
+        data
+      });
+  });
+}
+
+//审核排期
+exports.agreeSession = (req, res, next) => {
+  
+  sessionListTable.updateMany({_id:req.body},{status:1}, (err,data)=>{
+    if (err) return console.log(err);
+      res.json({
+        code:0,
+        msg:'审核成功'
+      });
   });
 }
