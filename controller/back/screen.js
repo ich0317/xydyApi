@@ -52,7 +52,7 @@ exports.getScreen = async (req, res, next) => {
     if(data.length == 0){
       res.json({
         code:1,
-        msg:'获取成功',
+        msg:'暂无影厅',
         data
       });
     }else{

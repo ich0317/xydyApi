@@ -17,7 +17,7 @@ router.get("/api/getCollegeList", film.getCollegeList);
 //获取影院列表
 router.get("/api/getCinemaList", film.getCinemaList); 
 //获取排期
-//router.get("/api/getFilmList", film.getFilmList); 
+router.get("/api/getIndexFilmList", film.getIndexFilmList); 
 //获取定位学校
 router.get("/api/getLocationCollege", film.getLocationCollege);
 
@@ -31,6 +31,8 @@ router.post("/api/login", loginManage.login);
 router.post("/api/addCollege", cinemaManage.addCollege);
 //搜索学校
 router.post("/api/searchCollege", cinemaManage.searchCollege);
+//获取学校
+router.get("/api/getCollege", cinemaManage.getCollege);
 //删除学校
 router.post("/api/delCollege", cinemaManage.delCollege);
 //添加影院
@@ -57,13 +59,18 @@ router.get("/api/getScreen", screenManage.getScreen);
 router.post("/api/addSeat", screenManage.addSeat);
 //获取座位
 router.post("/api/getSeat", screenManage.getSeat);
+/**
+ * 添加排期栏目
+ */
 //添加排期
 router.post("/api/addSession", planManage.addSession);
-//获取排期
-router.get("/api/getSession", planManage.getSession);
+//获取影厅和排期
+router.get("/api/getScreenSession", planManage.getScreenSession);
 //删除排期
 router.post("/api/delSession", planManage.delSession);
 //审核排期
 router.post("/api/agreeSession", planManage.agreeSession);
+
+
 
 module.exports = router;

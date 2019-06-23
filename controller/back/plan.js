@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const filmListTable = require("../../models/film_list");
 const sessionListTable = require("../../models/session_list");
+const screenListTable = require("../../models/screen_list");
 
 
 //查询影片
@@ -46,10 +47,27 @@ exports.addSession = (req, res, next) => {
   }
 }
 
-//获取排期
-exports.getSession = (req, res, next) => {
+//获取影厅和排期
+exports.getScreenSession = async (req, res, next) => {
   let { cinema_id, start_datetime } = req.query;
-  console.log(req.body);
+  console.log(cinema_id);
+  const screenRes = await screenListTable.find({cinema_id},(err,data)=>{
+    if (err) return console.log(err);
+    return data;
+  })
+
+  if(screenRes.length == 0){
+    res.json({
+      code:1,
+      msg:'暂无影厅',
+      data:{
+        screen:screenRes,
+        session:[]
+      }
+    });
+    return;
+  }
+
   sessionListTable.find({$and:[
     {cinema_id},
     {start_datetime:{$gte:`${start_datetime} 00:00`}},
@@ -60,13 +78,19 @@ exports.getSession = (req, res, next) => {
       res.json({
         code:1,
         msg:'暂无排期',
-        data
+        data:{
+          screen:screenRes,
+          session:[]
+        }
       });
     }else{
       res.json({
         code:0,
         msg:'获取成功',
-        data
+        data:{
+          screen:screenRes,
+          session:data
+        }
       });
     }
   });

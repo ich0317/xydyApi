@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-const bodyParser = require("body-parser"); //交互
-const mongoose = require("mongoose"); //数据库
 const collegeListTable = require("../../models/college_list");
-const filmListTable = require("../../models/film_list");
 const cinemaListTable = require("../../models/cinema_list");
+const sessionListTable = require("../../models/session_list");
+let { stampToTime } = require('../../utils/index');
+
 
 //获取学校列表
 exports.getCollegeList = (req, res, next) => {
@@ -49,17 +49,19 @@ exports.getCinemaList = (req, res, next) => {
   });
 };
 
-//获取当前学校排期
-exports.getFilmList = async (req, res, next) => {
+//首页获取当前学校排期
+exports.getIndexFilmList = async (req, res, next) => {
   let { cinema_id } = req.query;
-  let nowTimeStamp = Date.now() / 1000;
+  let nowTime = stampToTime(Date.now() / 1000,'YMDhm');
+  console.log(nowTime);
 
+  //获取影院
   let r = await cinemaListTable.find({ _id: cinema_id });
-
+  //获取学校
   let rr = await collegeListTable.find({ _id: r[0].college_id });
 
   await sessionListTable.find(
-    { cinema_id, end_datetime: { $gt: nowTimeStamp } },
+    { cinema_id, end_datetime: { $gt: nowTime }, status:1 },
     (err, session) => {
       if (err) return console.log(err);
       if (session.length == 0) {

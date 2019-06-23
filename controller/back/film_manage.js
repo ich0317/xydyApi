@@ -75,9 +75,9 @@ exports.upFilmPhoto = (req, res, next) => {
   });
 };
 
-//获取影片
-exports.getFilmList = (req, res, next) => {
-  let { film_name, release_date } = req.body;
+//获取影片列表
+exports.getFilmList = async (req, res, next) => {
+  let { film_name, release_date, page = 1, page_size = 10 } = req.body;
   let getCond = {};
   let condArr = [];
 
@@ -94,24 +94,38 @@ exports.getFilmList = (req, res, next) => {
     });
   }
 
+  let n = (Number(page)-1)*page_size;
+  let numAdventures = await filmListTable.estimatedDocumentCount({},(err,length)=>{
+      return length;
+  });
+
   if (!!condArr.length) {
     //有条件
     getCond = { $and: condArr };
   }
 
-  filmListTable.find(getCond, (err, data) => {
+  filmListTable.find(getCond).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, data) => {
     if (err) return console.log(err);
+    if(!!condArr.length){
+        numAdventures = data.length;
+    }
     if (data.length == 0) {
       res.json({
         code: 1,
         msg: "暂无数据",
-        data
+        data:{
+          film:data,
+          total:numAdventures
+        }
       });
     } else {
       res.json({
         code: 0,
         msg: "获取成功",
-        data
+        data:{
+          film:data,
+          total:numAdventures
+        }
       });
     }
   });
