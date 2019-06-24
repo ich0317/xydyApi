@@ -53,22 +53,33 @@ exports.getCinemaList = (req, res, next) => {
 exports.getIndexFilmList = async (req, res, next) => {
   let { cinema_id } = req.query;
   let nowTime = stampToTime(Date.now() / 1000,'YMDhm');
-  console.log(nowTime);
-
+  
   //获取影院
   let r = await cinemaListTable.find({ _id: cinema_id });
+  if(r.length == 0){
+    res.json({
+      code: 2,
+      msg: "暂无影院"
+    });
+    return;
+  }
   //获取学校
   let rr = await collegeListTable.find({ _id: r[0].college_id });
-
+  
   await sessionListTable.find(
     { cinema_id, end_datetime: { $gt: nowTime }, status:1 },
     (err, session) => {
       if (err) return console.log(err);
+      
       if (session.length == 0) {
         res.json({
           code: 1,
           msg: "暂无数据",
-          data: []
+          data: {
+            college_name: rr[0].college_name,
+            address: rr[0].address,
+            cinema_name: r[0].cinema_name
+          }
         });
       } else {
         session.sort((a, b) => a.start_datetime - b.start_datetime);
