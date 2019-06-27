@@ -108,6 +108,11 @@ exports.getCollege = async (req, res, next) => {
 
 //添加影院
 exports.addCinema = (req, res, next) => {
+    let aParams = req.body;
+    console.log(req.body);
+    aParams.province = aParams.area[0];
+    aParams.city = aParams.area[1];
+    delete aParams.area;
     if (req.body._id) {
         //修改
         cinemaListTable.update(
