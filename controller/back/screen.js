@@ -75,20 +75,22 @@ exports.getScreen = async (req, res, next) => {
 }
 
 //添加座位
-exports.addSeat = (req,res,err)=>{
+exports.addSeat = async (req,res,err)=>{
   let {seat} = req.body;
-  if(seat[0]._id){
+
+  if(seat[0].screen_id){
     //修改
-  }else{
-    //增加
-    seatListTable.insertMany(seat,(err,data)=>{
-      if (err) return console.log(err);
-      res.json({
-        code:0,
-        msg:'保存成功'
-      });
-    });
+    seatListTable.deleteMany({screen_id:seat[0].screen_id},(err,data=>data));
   }
+  //增加
+  seatListTable.insertMany(seat,(err,data)=>{
+    if (err) return console.log(err);
+    res.json({
+      code:0,
+      msg:'保存成功',
+      data
+    });
+  });
 }
 
 //获取座位

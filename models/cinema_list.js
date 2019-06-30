@@ -6,7 +6,8 @@ const cinemaList = new mongoose.Schema({
     address:String,
     serve_price:Number,
     stop_sale:Number,
-    lat_lng:String,    //维度和精度
+    lat:String,    //维度和精度
+    lng:String,
     status:Boolean, //影院状态
 });
 module.exports = mongoose.model('cinemaList', cinemaList);

@@ -2,24 +2,34 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const film = require('../controller/front/film');
+const order = require('../controller/front/order');
+const news = require('../controller/front/news');
+
 const cinemaManage = require('../controller/back/cinema_manage');
 const filmManage = require('../controller/back/film_manage');
 const loginManage = require('../controller/back/login');
 const planManage = require('../controller/back/plan');
 const screenManage = require('../controller/back/screen');
+const newsManage = require('../controller/back/news');
 
 /**
  **** 前台api
  */
 
-//获取学校列表
-router.get("/api/getCollegeList", film.getCollegeList);
+//获取城市
+router.get("/api/getCityList", film.getCityList);
 //获取影院列表
 router.get("/api/getCinemaList", film.getCinemaList); 
 //获取排期
 router.get("/api/getIndexFilmList", film.getIndexFilmList); 
 //获取定位学校
 router.get("/api/getLocationCollege", film.getLocationCollege);
+//获取座位图
+router.get("/api/getSeat", film.getSeat);
+//提交订单
+router.post("/api/placeOrder", order.placeOrder);
+
+router.get("/api/getFindNew", news.getFindNew);
 
 /**
  **** 后台api
@@ -35,8 +45,15 @@ router.post("/api/searchCollege", cinemaManage.searchCollege);
 router.get("/api/getCollege", cinemaManage.getCollege);
 //删除学校
 router.post("/api/delCollege", cinemaManage.delCollege);
+/**
+ * 影院管理
+ */
 //添加影院
 router.post("/api/addCinema", cinemaManage.addCinema);
+//获取影院列表
+router.get("/api/getCinema", cinemaManage.getCinema);
+//获取影院详情
+router.get("/api/getCinemaDetail", cinemaManage.getCinemaDetail);
 //删除影院
 router.post("/api/delCinema", cinemaManage.delCinema);
 //添加影片
@@ -70,7 +87,18 @@ router.get("/api/getScreenSession", planManage.getScreenSession);
 router.post("/api/delSession", planManage.delSession);
 //审核排期
 router.post("/api/agreeSession", planManage.agreeSession);
-
-
+/**
+ * 新闻栏目
+ */
+//添加新闻图片
+router.post("/api/upNewsPhoto", newsManage.upNewsPhoto);
+//添加新闻
+router.post("/api/addNews", newsManage.addNews);
+//获取新闻列表
+router.get("/api/getNewsList", newsManage.getNewsList);
+//获取新闻详情
+router.get("/api/getNewsDetail", newsManage.getNewsDetail);
+//删除新闻
+router.post("/api/delNews", newsManage.delNews);
 
 module.exports = router;

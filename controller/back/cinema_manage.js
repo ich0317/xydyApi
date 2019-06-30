@@ -85,14 +85,14 @@ exports.getCollege = async (req, res, next) => {
     let { college_name, page = 1, page_size = 10 } = req.query;
     let queryCond = college_name ? { 'college_name': { '$regex': college_name } } : {};
 
-    let n = (Number(page)-1)*page_size;
-    let numAdventures = await collegeListTable.estimatedDocumentCount({},(err,length)=>{
+    let n = (Number(page) - 1) * page_size;
+    let numAdventures = await collegeListTable.estimatedDocumentCount({}, (err, length) => {
         return length;
     });
-    
+
     collegeListTable.find(queryCond).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, college) => {
         if (err) return console.log(err);
-        if(college_name){
+        if (college_name) {
             numAdventures = college.length;
         }
         res.json({
@@ -107,12 +107,15 @@ exports.getCollege = async (req, res, next) => {
 }
 
 //添加影院
-exports.addCinema = (req, res, next) => {
+exports.addCinema = async (req, res, next) => {
     let aParams = req.body;
-    console.log(req.body);
-    aParams.province = aParams.area[0];
-    aParams.city = aParams.area[1];
+    aParams.province = `${aParams.areaCn[0]},${aParams.area[0]}`;
+    aParams.city = `${aParams.areaCn[1]},${aParams.area[1]}`;
+    let latLngArr = aParams.lat_lng.split(',');
+    req.body.lat = latLngArr[0];
+    req.body.lng = latLngArr[1];
     delete aParams.area;
+    delete aParams.areaCn;
     if (req.body._id) {
         //修改
         cinemaListTable.update(
@@ -129,20 +132,84 @@ exports.addCinema = (req, res, next) => {
         );
     } else {
         //新增
-        cinemaListTable.create(req.body, (err, data) => {
-            if (err) console.log(err);
+        const r = await cinemaListTable.findOne({
+            $and: [
+                { cinema_name: aParams.cinema_name },
+                { city: { '$regex': aParams.city } }
+            ]
+        }, (err, data) => data);
+
+        if (r) {
             res.json({
-                code: 0,
-                msg: "保存成功",
-                data
+                code: -1,
+                msg: "同一地区影院名称不能重复"
             });
-        });
+        } else {
+            await cinemaListTable.create(req.body, (err, data) => {
+                if (err) console.log(err);
+                res.json({
+                    code: 0,
+                    msg: "保存成功",
+                    data
+                });
+            });
+        }
+
+
     }
 };
 
+//获取影院列表
+exports.getCinema = async (req, res, next) => {
+    let { page = 1, page_size = 10 } = req.query;
+    //let queryCond = college_name ? { 'college_name': { '$regex': college_name } } : {};
+
+    let n = (Number(page) - 1) * page_size;
+    let numAdventures = await cinemaListTable.estimatedDocumentCount({}, (err, length) => {
+        return length;
+    });
+
+    await cinemaListTable.find({}).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, data) => {
+        if (err) return console.log(err);
+        if (data.length == 0) {
+            res.json({
+                code: 1,
+                msg: "暂无影院",
+                data: {
+                    data,
+                    total: numAdventures
+                }
+            });
+        } else {
+            res.json({
+                code: 0,
+                msg: "获取成功",
+                data: {
+                    data,
+                    total: numAdventures
+                }
+            });
+        }
+    });
+}
+
+//获取影院详情
+exports.getCinemaDetail = async (req, res, next) => {
+    let { cinema_id } = req.query;
+    if (cinema_id) {
+        cinemaListTable.findOne({ _id: cinema_id }, (err, data) => {
+            if (err) return console.log(err);
+            res.json({
+                code: 0,
+                msg: "获取成功",
+                data: data
+            });
+        })
+    }
+}
 //删除影院
 exports.delCinema = (req, res, next) => {
-    cinemaListTable.remove({ _id: req.body._id }, (err, data) => {
+    cinemaListTable.deleteOne({ _id: req.body._id }, (err, data) => {
         if (err) console.log(err);
         res.json({
             code: 0,

@@ -10,6 +10,7 @@ const mongoose = require("mongoose"); //数据库
 // const adminUserTable = require("./models/admin_user");
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
+let aaa = 1;
    
 app.use(
   bodyParser.urlencoded({
@@ -44,7 +45,6 @@ app.all('/*', function(req, res, next){
       }
     });
   }else{
-    console.log(2222);
     next();
   }
 })
