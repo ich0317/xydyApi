@@ -72,25 +72,40 @@ exports.addNews = (req, res, next) => {
 }
 
 //获取新闻列表
-exports.getNewsList = (req, res, next) => {
-  newsListTable.find({}, 'title editor release_date like views status').sort({_id:-1}).exec((err, data) => {
+exports.getNewsList = async (req, res, next) => {
+  let { title, page = 1, page_size = 10 } = req.query;
+  let n = (Number(page) - 1) * page_size;
+  let searchCond = title ? {title:{'$regex':title}} : {};
+
+  //查询总条数
+  let numAdventures = await newsListTable.estimatedDocumentCount({}, (err, length) => length);
+
+  newsListTable.find(searchCond, 'title editor release_date like views status').skip(n).limit(Number(page_size)).sort({_id:-1}).exec((err, data) => {
+    
+    numAdventures = title ? data.length : numAdventures;
     if (data.length == 0) {
       res.json({
         code: 1,
         msg: '暂无数据',
-        data
+        data:{
+          list:data,
+          total:numAdventures
+        }
       });
     } else {
       res.json({
         code: 0,
         msg: '获取成功',
-        data
+        data:{
+          list:data,
+          total:numAdventures
+        }
       });
     }
   });
 }
 
-//获取新闻列表
+//获取新闻详情
 exports.getNewsDetail = (req, res, next) => {
   let { _id } = req.query;
   newsListTable.findOne({ _id }).exec((err, data) => {

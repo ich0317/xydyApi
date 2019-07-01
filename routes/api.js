@@ -28,8 +28,12 @@ router.get("/api/getLocationCollege", film.getLocationCollege);
 router.get("/api/getSeat", film.getSeat);
 //提交订单
 router.post("/api/placeOrder", order.placeOrder);
-
+//获取新闻列表
 router.get("/api/getFindNew", news.getFindNew);
+//获取新闻详情
+router.get("/api/getFindDetail", news.getFindDetail);
+//新闻点赞
+router.post("/api/like", news.like);
 
 /**
  **** 后台api
