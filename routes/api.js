@@ -4,6 +4,7 @@ const router = express.Router();
 const film = require('../controller/front/film');
 const order = require('../controller/front/order');
 const news = require('../controller/front/news');
+const user = require('../controller/front/user');
 
 const cinemaManage = require('../controller/back/cinema_manage');
 const filmManage = require('../controller/back/film_manage');
@@ -34,6 +35,8 @@ router.get("/api/getFindNew", news.getFindNew);
 router.get("/api/getFindDetail", news.getFindDetail);
 //新闻点赞
 router.post("/api/like", news.like);
+//登录
+router.post("/api/userLogin", user.userLogin);
 
 /**
  **** 后台api
