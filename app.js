@@ -4,9 +4,7 @@ const bodyParser = require("body-parser"); //交互
 const mongoose = require("mongoose"); //数据库
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
-
-
-   
+  
 app.use(
   bodyParser.urlencoded({
     limit: "50mb",
@@ -22,10 +20,10 @@ app.use(
 
 
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
-console.dir(routerApi.stack[0].route.path);
+
 //登录拦截
 app.all('/*', function(req, res, next){
-console.dir(req);
+
   let getToken = req.headers['x-token'];
   let getClientRouter = req.url;  //获取客户端访问路由
 

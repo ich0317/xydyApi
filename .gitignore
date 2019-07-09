@@ -1,7 +1,8 @@
 .DS_Store
 node_modules/
 db/
-
+uploads/film_photos/
+uploads/news_photos/
 # Editor directories and files
 .idea
 .vscode
