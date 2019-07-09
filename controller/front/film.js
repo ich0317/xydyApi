@@ -1,38 +1,33 @@
 const express = require('express');
 const app = express();
-const collegeListTable = require("../../models/college_list");
 const cinemaListTable = require("../../models/cinema_list");
 const sessionListTable = require("../../models/session_list");
+const seatListTable = require("../../models/seat_list");
 let { stampToTime } = require('../../utils/index');
 
 
-//获取学校列表
-exports.getCollegeList = (req, res, next) => {
-  let {college_name} = req.query;
-    college_name = college_name ? {'college_name': {'$regex': college_name}} : {};
-    collegeListTable.find( college_name).exec((err, college) => {
-      if (err) return console.log(err);
-      res.json({
-        code: 0,
-        msg: "获取成功",
-        data: college
-      });
+//获取城市列表
+exports.getCityList = (req, res, next) => {
+  cinemaListTable.find({}, 'province city lat_lng', (err, data) => {
+    if (err) return console.log(err);
+    res.json({
+      code: 0,
+      msg: "获取成功",
+      data: data
+    });
   });
 }
 
 //获取影院列表
 exports.getCinemaList = (req, res, next) => {
-  let findCondi = null;
-  
-  if(req.query.cinema_name){
-    findCondi = {'cinema_name': {'$regex': req.query.cinema_name}};
-  }else{
-    findCondi = req.query.college_id ? {college_id : req.query.college_id} : {};
-  }
 
-  cinemaListTable.find(findCondi, (err, data) => {
+  cinemaListTable.find({
+    city: {
+      $regex: req.query.city
+    }
+  }, (err, data) => {
     if (err) return console.log(err);
- 
+
     if (data.length == 0) {
       res.json({
         code: 1,
@@ -52,23 +47,32 @@ exports.getCinemaList = (req, res, next) => {
 //首页获取当前学校排期
 exports.getIndexFilmList = async (req, res, next) => {
   let { cinema_id } = req.query;
-  let nowTime = stampToTime(Date.now() / 1000,'YMDhm');
-  console.log(nowTime);
+  let nowTime = stampToTime(Date.now() / 1000, 'YMDhm');
 
   //获取影院
-  let r = await cinemaListTable.find({ _id: cinema_id });
-  //获取学校
-  let rr = await collegeListTable.find({ _id: r[0].college_id });
+  let r = await cinemaListTable.findOne({ _id: cinema_id }, 'cinema_name address') || [];
+
+  if (r.length == 0) {
+    res.json({
+      code: 2,
+      msg: "暂无影院"
+    });
+    return;
+  }
 
   await sessionListTable.find(
-    { cinema_id, end_datetime: { $gt: nowTime }, status:1 },
+    { cinema_id, end_datetime: { $gt: nowTime }, status: 1 },
     (err, session) => {
       if (err) return console.log(err);
+   
       if (session.length == 0) {
         res.json({
           code: 1,
           msg: "暂无数据",
-          data: []
+          data: {
+            session,
+            info: r
+          }
         });
       } else {
         session.sort((a, b) => a.start_datetime - b.start_datetime);
@@ -77,9 +81,7 @@ exports.getIndexFilmList = async (req, res, next) => {
           msg: "获取成功",
           data: {
             session,
-            college_name: rr[0].college_name,
-            address: rr[0].address,
-            cinema_name: r[0].cinema_name
+            info: r
           }
         });
       }
@@ -88,36 +90,44 @@ exports.getIndexFilmList = async (req, res, next) => {
 };
 //获取定位学校
 exports.getLocationCollege = (req, res, next) => {
-  let { longitude, latitude } = req.query;
+  let { lng, lat } = req.query;
   /**
    * 经纬度 : 距离
    * 维度0.0009:100米
    * 经度0.0012:100米
    * 允许定位范围半径1公里
    */
-  let rightLongitude = 1 * longitude + 0.012;
-  let leftLongitude = 1 * longitude - 0.012;
-  let topLatitude = 1 * latitude + 0.009;
-  let bottomLatitude = 1 * latitude - 0.009;
+  let rightLongitude = 1 * lng + 0.012;
+  let leftLongitude = 1 * lng - 0.012;
+  let topLatitude = 1 * lat + 0.009;
+  let bottomLatitude = 1 * lat - 0.009;
 
-  collegeListTable.find(
+  cinemaListTable.findOne(
     {
       $and: [
-        { longitude: { $lt: rightLongitude } },
-        { longitude: { $gt: leftLongitude } },
-        { latitude: { $lt: topLatitude } },
-        { latitude: { $gt: bottomLatitude } }
+        { lng: { $lt: rightLongitude } },
+        { lng: { $gt: leftLongitude } },
+        { lat: { $lt: topLatitude } },
+        { lat: { $gt: bottomLatitude } }
       ]
     },
     (err, location) => {
       if (err) return console.log(err);
-      if (location.length == 0) {
+     
+      if (!location) {
         res.json({
           code: 1,
           msg: "没有定位到附近学校",
-          data: location
+          data: [lat,lng]
         });
       } else {
+        // let arr = [];
+        // location.forEach((v,i)=>{
+        //   let newLat = 1*v.lat - 1*lat;
+        //   let newLng = 1*v.lng - 1*lng;
+        //   arr.push({[i]:Math.sqrt(newLat*newLat+newLng*newLng)});
+        // })
+    
         res.json({
           code: 0,
           msg: "获取成功",
@@ -128,8 +138,27 @@ exports.getLocationCollege = (req, res, next) => {
   );
 };
 
-
-
+//获取座位信息
+exports.getSeat = async (req, res, err) => {
+  let { screen_id, _id } = req.query;
+  const r = await sessionListTable.findOne({ _id }, 'film_name film_version start_datetime language' ,(err, data) => data);
+  await seatListTable.find({
+    $and: [
+      { screen_id },
+      { is_show: 1 }
+    ]
+  }, (err, data) => {
+    if (err) return console.log(err);
+    res.json({
+      code: 0,
+      msg: "获取成功",
+      data: {
+        seat:data,
+        film_info:r
+      }
+    });
+  })
+}
 
 
 

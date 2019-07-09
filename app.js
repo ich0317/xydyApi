@@ -2,14 +2,10 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser"); //交互
 const mongoose = require("mongoose"); //数据库
-// const collegeListTable = require("./models/college_list"); //数据表
-// const filmListTable = require("./models/film_list");
-// const cinemaListTable = require("./models/cinema_list");
-// const screenListTable = require("./models/screen_list");
-// const sessionListTable = require("./models/session_list");
-// const adminUserTable = require("./models/admin_user");
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
+
+
    
 app.use(
   bodyParser.urlencoded({
@@ -26,29 +22,65 @@ app.use(
 
 
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
-
+console.dir(routerApi.stack[0].route.path);
 //登录拦截
 app.all('/*', function(req, res, next){
+console.dir(req);
   let getToken = req.headers['x-token'];
+  let getClientRouter = req.url;  //获取客户端访问路由
 
-  if(!!getToken){
-    jwt.verify(getToken, 'a1234', function(err, decoded) {
+  if(req.headers.referer.indexOf('http://192.168.0.107:8082/')!=-1){
+   
+    //前台
+    if(!!getToken){
       
-      if(decoded){
-        next();
+      //有token
+      jwt.verify(getToken, 'b1234', function(err, decoded) {
+       
+        if(decoded){
+        
+          next();
+        }else{
+          
+          res.json({
+            code:20003,
+            msg:'登录已过期'
+          });
+        }
+      });
+    }else{
+      if(getClientRouter.indexOf('/api/userLogin') != -1){
+        next()
       }else{
         res.json({
           code:20003,
-          'msg':'登录已过期'
+          msg:'请先登录'
         });
       }
-    });
+    }
   }else{
-    next();
+   
+    //后台
+    if(!!getToken){
+      jwt.verify(getToken, 'a1234', function(err, decoded) {
+        
+        if(decoded){
+          next();
+        }else{
+          res.json({
+            code:20003,
+            'msg':'登录已过期'
+          });
+        }
+      });
+    }else{
+      next();
+    }
+
   }
 })
 
-app.use('/', routerApi);
+app.use('/api', routerApi);
  
 mongoose.connect("mongodb://localhost:27017/xydy", {
   useNewUrlParser: true

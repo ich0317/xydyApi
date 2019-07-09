@@ -5,6 +5,7 @@ const screenList = new mongoose.Schema({
     sound_type:String,  //音响类型
     screen_status:Boolean,   //状态
     seat_amount:Number,     //座位数量
-    cinema_id:String    //所属影院id
+    cinema_id:String   //所属影院id
+
 });
 module.exports = mongoose.model('screenList', screenList);

@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 const cinemaList = new mongoose.Schema({
-    cinema_name:String,   //影院名称
-    screen_amount:Number,   //影厅数量
-    worker_name:String,  //管理人姓名
-    worker_tel:Number,   //联系方式
-    cinema_status:Boolean,   //影院状态
-    college_id:String   //所属学校id
+    cinema_name:String,   //影院名称 
+    province:String,
+    city:String,
+    address:String,
+    serve_price:Number,
+    stop_sale:Number,
+    lat:String,    //维度和精度
+    lng:String,
+    status:Boolean, //影院状态
 });
 module.exports = mongoose.model('cinemaList', cinemaList);

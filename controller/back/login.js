@@ -1,5 +1,6 @@
 const adminUserTable = require("../../models/admin_user");
 let jwt = require('jsonwebtoken');
+let user_name = null;
 //登录
 exports.login = (req, res, next) => {
     let { username, password } = req.body;
@@ -13,7 +14,7 @@ exports.login = (req, res, next) => {
             });
         } else {
             let content = { username: data[0].username, user_id: data[0]._id };
-            let token = jwt.sign(content, "a1234", { expiresIn: 60*60 });  //秒
+            let token = jwt.sign(content, "a1234", { expiresIn: 60*600 });  //秒
             res.json({
                 code: 0,
                 msg: "登录成功",
@@ -22,6 +23,7 @@ exports.login = (req, res, next) => {
                     ...content
                 }
             });
+            user_name = data[0].username;
         }
     });
 };
