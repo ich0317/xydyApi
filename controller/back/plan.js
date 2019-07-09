@@ -3,6 +3,7 @@ const app = express();
 const filmListTable = require("../../models/film_list");
 const sessionListTable = require("../../models/session_list");
 const screenListTable = require("../../models/screen_list");
+const seatListTable = require("../../models/seat_list");
 let { stampToTime } = require("../../utils/index");
 const SESSION_STATUS = [0, 1, 2, 3]; //（0未审核 1已审核 2禁售 3完场）
 
@@ -30,14 +31,14 @@ exports.searchFilm = (req, res, next) => {
 };
 
 //设置排期
-exports.addSession = (req, res, next) => {
-  console.log(req.body);
-  let { _id } = req.body;
+exports.addSession = async (req, res, next) => {
+  let { _id, screen_id } = req.body;
   if(_id){
     //修改
   }else{
     //新增
-    sessionListTable.create(req.body,(err,data)=>{
+    //const copySeatMap = await seatListTable.find({screen_id},(err,data)=>data);
+    sessionListTable.create({...req.body},(err,data)=>{
       if (err) return console.log(err);
       res.json({
         code:0,

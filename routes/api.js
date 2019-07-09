@@ -29,6 +29,12 @@ router.get("/getLocationCollege", film.getLocationCollege);
 router.get("/getSeat", film.getSeat);
 //提交订单
 router.post("/placeOrder", order.placeOrder);
+//获取订单详情
+router.get("/orderDetail", order.orderDetail);
+//取消订单
+router.post("/cancelOrder", order.cancelOrder);
+//订单支付
+router.post("/payOrder", order.payOrder);
 //获取新闻列表
 router.get("/getFindNew", news.getFindNew);
 //获取新闻详情

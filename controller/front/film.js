@@ -3,8 +3,9 @@ const app = express();
 const cinemaListTable = require("../../models/cinema_list");
 const sessionListTable = require("../../models/session_list");
 const seatListTable = require("../../models/seat_list");
+const orderListTable = require("../../models/order_list");
 let { stampToTime } = require('../../utils/index');
-
+const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
 
 //获取城市列表
 exports.getCityList = (req, res, next) => {
@@ -147,14 +148,46 @@ exports.getSeat = async (req, res, err) => {
       { screen_id },
       { is_show: 1 }
     ]
-  }, (err, data) => {
+  },async (err, data) => {
     if (err) return console.log(err);
+
+    const getUsedSeat = await orderListTable.find({session_id:_id});
+    let usedSeat = null;
+    let myUsedSeat =null;
+    let userId = global.piaoUserId || '';
+ 
+    getUsedSeat.forEach(v=>{
+      if(v.user_id == userId){
+        //用户自己看的座位
+        myUsedSeat = [].concat(v.seat_id);
+      }else{
+        //其他用户看的座位
+        usedSeat = [].concat(v.seat_id);
+      } 
+    })
+
+    if(usedSeat){
+      data.filter(v=>{
+        if(usedSeat.includes((v._id+''))){
+          v.seat_status = SEAT_STATUS[2];
+        }
+      })
+    }
+    if(myUsedSeat){
+      data.filter(v=>{
+        if(myUsedSeat.includes((v._id+''))){
+          v.seat_status = SEAT_STATUS[4];
+        }
+      })
+    }
+
     res.json({
       code: 0,
       msg: "获取成功",
       data: {
         seat:data,
-        film_info:r
+        film_info:r,
+        mySeat:myUsedSeat
       }
     });
   })

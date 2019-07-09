@@ -19,6 +19,7 @@ const sessionList = new mongoose.Schema({
     cinema_id:String,    //所属影院id
     screen_id:String,    //所属影厅id
     film_id:String,  //影片id
-    status:Number   //状态 （0未审核 1已审核 2禁售 3完场）
+    status:Number,   //状态 （0未审核 1已审核 2禁售 3完场）
+    //session_seat:Array
 });
 module.exports = mongoose.model('sessionList', sessionList);
