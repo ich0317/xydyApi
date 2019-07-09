@@ -44,7 +44,6 @@ app.all('/*', function(req, res, next){
       }
     });
   }else{
-    console.log(2222);
     next();
   }
 })

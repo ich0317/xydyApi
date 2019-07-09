@@ -10,14 +10,14 @@ let { stampToTime } = require('../../utils/index');
 exports.getCollegeList = (req, res, next) => {
   let {college_name} = req.query;
     college_name = college_name ? {'college_name': {'$regex': college_name}} : {};
-    collegeListTable.find( college_name, (err, college) => {
-        if (err) return console.log(err);
-        res.json({
-          code: 0,
-          msg: "获取成功",
-          data: college
-        });
-    });
+    collegeListTable.find( college_name).exec((err, college) => {
+      if (err) return console.log(err);
+      res.json({
+        code: 0,
+        msg: "获取成功",
+        data: college
+      });
+  });
 }
 
 //获取影院列表
