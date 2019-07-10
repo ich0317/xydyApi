@@ -26,7 +26,9 @@ app.all('/*', function(req, res, next){
 
   let getToken = req.headers['x-token'];
   let getClientRouter = req.url;  //获取客户端访问路由
-  let { needLogin } = getMethod[req.method](req);
+ 
+  //let { needLogin } = getMethod[req.method](req);
+  let needLogin = null;
 
   if (typeof needLogin === 'string' && needLogin === 'true') {
     //需要登录权限
