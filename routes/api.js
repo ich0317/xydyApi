@@ -43,6 +43,8 @@ router.get("/getFindDetail", news.getFindDetail);
 router.post("/like", news.like);
 //登录
 router.post("/userLogin", user.userLogin);
+//注册
+router.post("/userReg", user.userReg);
 
 /**
  **** 后台api

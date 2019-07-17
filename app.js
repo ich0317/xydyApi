@@ -26,40 +26,51 @@ app.all('/*', function(req, res, next){
 
   let getToken = req.headers['x-token'];
   let getClientRouter = req.url;  //获取客户端访问路由
+  let getMethod = {
+    GET:function(){
+      return req.query;
+    },
+    POST:function(){
+      return req.body;
+    }
+  };
   let { needLogin } = getMethod[req.method](req);
 
-  if (typeof needLogin === 'string' && needLogin === 'true') {
     //需要登录权限
     if (req.headers.referer.indexOf('http://192.168.0.107:8082/') != -1) {
 
       //前台
-      if (!!getToken) {
+      if(needLogin){  //是否需要权限验证
+        if (!!getToken) {
 
-        //有token
-        jwt.verify(getToken, 'b1234', function (err, decoded) {
+          //有token
+          jwt.verify(getToken, 'b1234', function (err, decoded) {
 
-          if (decoded) {
-            global.piaoUserId = decoded.user_id;
-            next();
+            if (decoded) {
+              global.piaoUserId = decoded.user_id;
+              next();
+            } else {
+
+              res.json({
+                code: 20003,
+                msg: '登录已过期'
+              });
+              
+            }
+            
+          });
+        } else {
+          if (getClientRouter.indexOf('/api/userLogin') != -1) {
+            next()
           } else {
-
             res.json({
               code: 20003,
-              msg: '登录已过期'
+              msg: '请先登录'
             });
-            
           }
-          
-        });
-      } else {
-        if (getClientRouter.indexOf('/api/userLogin') != -1) {
-          next()
-        } else {
-          res.json({
-            code: 20003,
-            msg: '请先登录'
-          });
         }
+      }else{
+        next();
       }
     } else {
 
@@ -80,27 +91,6 @@ app.all('/*', function(req, res, next){
         next();
       }
     }
-  }else{
-
-   
-    //后台
-    if(!!getToken){
-      jwt.verify(getToken, 'a1234', function(err, decoded) {
-        
-        if(decoded){
-          next();
-        }else{
-          res.json({
-            code:20003,
-            'msg':'登录已过期'
-          });
-        }
-      });
-    }else{
-      next();
-    }
-
-  }
 
 })
 
