@@ -26,6 +26,7 @@ app.all('/*', function(req, res, next){
 
   let getToken = req.headers['x-token'];
   let getClientRouter = req.url;  //获取客户端访问路由
+
   let getMethod = {
     GET:function(){
       return req.query;
