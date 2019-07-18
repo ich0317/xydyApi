@@ -25,3 +25,23 @@ exports.userLogin = async (req, res, next) => {
     
   });
 }
+//注册
+exports.userReg = async (req, res, next) => {
+  let {username, password, config_password} = req.body;
+  const hasUser =await userListTable.findOne({username},(err,data)=>data);
+  if(hasUser){
+    res.json({
+      code:-1,
+      msg:'用户已存在'
+    });
+  }else{
+    userListTable.create({username, password},(err,data)=>{
+      res.json({
+        code:0,
+        msg:'注册成功',
+        data
+      });
+    });
+  }
+}
+
