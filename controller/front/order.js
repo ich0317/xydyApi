@@ -3,6 +3,7 @@ const sessionListTable = require("../../models/session_list");
 const orderListTable = require("../../models/order_list");
 const cinemaListTable = require("../../models/cinema_list");
 let { stampToTime, timeToStamp } = require('../../utils/index');
+let { parseToken } = require('../../utils/token');
 let qr = require('qr-image')
 
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
@@ -12,7 +13,9 @@ const ORDER_STATUS = [0, 1, 2, 3];  //（0未支付 1已支付 2已退款  3已�
 //下单
 exports.placeOrder = async (req, res, next) => {
   let { session_id, seat_id } = req.body;
-  let userId = global.piaoUserId || '';
+  //let userId = global.piaoUserId || '';
+  let getToken = req.headers['x-token'];
+  let {user_id, username} = parseToken(getToken,'b1234');
   /**
    * 下单流程
    * 1.查找此用户是否有未完成订单 
@@ -22,14 +25,14 @@ exports.placeOrder = async (req, res, next) => {
    * 5.生成新订单
    * find 数据无法修改           
    */
-
+  
   //1
-  const findOrder = await orderListTable.findOne({ user_id: userId,status:ORDER_STATUS[0] }, (err, data) => data);
+  const findOrder = await orderListTable.findOne({ user_id,status:ORDER_STATUS[0] }, (err, data) => data);
   //2
   let findSeat = await orderListTable.find({
     session_id,
     $nor: [
-      { user_id: userId }
+      { user_id }
     ]
   }, async (err, data) => {
     let seatArr;
@@ -67,8 +70,8 @@ exports.placeOrder = async (req, res, next) => {
 
       //5
       let createInfo = {
-        
-          user_id: userId, //用户id
+          username,
+          user_id, //用户id
           order_num: Date.now(),   //订单号
           session_id,
           seat,    //座位
@@ -129,7 +132,7 @@ exports.orderDetail = (req, res, next) => {
       res.json({
         code: 0,
         msg: '获取成功',
-        data:{...{...data}._doc, serverDate:Date.now()}
+        data:{...{...data}._doc, server_datetime:Date.now()}
       })
     }else{
       res.json({
@@ -184,4 +187,27 @@ let timer = setInterval(()=>{
       });
     }
   })
-},30000)
+},30000);
+
+//获取订单列表
+exports.getOrderList = (req, res, err)=>{
+  let getToken = req.headers['x-token'];
+  let {user_id, username} = parseToken(getToken,'b1234');
+  orderListTable.find({user_id},'cinema_name film_name start_datetime seat status end_datetime').sort({_id:-1}).exec((err,data)=>{
+    if(data.length == 0){
+      res.json({
+        code: 1,
+        msg: '暂无订单'
+      })
+    }else{
+      res.json({
+        code: 0,
+        msg: '获取成功',
+        data:{
+          list:data,
+          server_datetime:Date.now() / 1000
+        }
+      })
+    }
+  })
+}

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const orderList = new mongoose.Schema({
     user_id:String, //用户id
+    username:String, //用户名
     order_num:String,   //订单号
     seat:Array,    //座位
     seat_id:Array,
@@ -25,7 +26,8 @@ const orderList = new mongoose.Schema({
     QR:{    //取票二维码
         type:String,
         default:null
-    }  
+    },
+    session_id:String   //场次id
     
 });
 module.exports = mongoose.model('orderList', orderList);

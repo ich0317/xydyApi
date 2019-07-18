@@ -27,6 +27,7 @@ router.get("/getIndexFilmList", film.getIndexFilmList);
 router.get("/getLocationCollege", film.getLocationCollege);
 //获取座位图
 router.get("/getSeat", film.getSeat);
+
 //提交订单
 router.post("/placeOrder", order.placeOrder);
 //获取订单详情
@@ -35,12 +36,16 @@ router.get("/orderDetail", order.orderDetail);
 router.post("/cancelOrder", order.cancelOrder);
 //订单支付
 router.post("/payOrder", order.payOrder);
+//订单列表
+router.get("/getOrderList", order.getOrderList);
+
 //获取新闻列表
 router.get("/getFindNew", news.getFindNew);
 //获取新闻详情
 router.get("/getFindDetail", news.getFindDetail);
 //新闻点赞
 router.post("/like", news.like);
+
 //登录
 router.post("/userLogin", user.userLogin);
 //注册

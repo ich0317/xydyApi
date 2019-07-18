@@ -6,6 +6,7 @@ const seatListTable = require("../../models/seat_list");
 const orderListTable = require("../../models/order_list");
 let { stampToTime } = require('../../utils/index');
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
+const ORDER_STATUS = [0, 1, 2, 3];  //（0未支付、1已支付、2已退款、3已关闭）
 
 //获取城市列表
 exports.getCityList = (req, res, next) => {
@@ -150,36 +151,22 @@ exports.getSeat = async (req, res, err) => {
     ]
   },async (err, data) => {
     if (err) return console.log(err);
-
-    const getUsedSeat = await orderListTable.find({session_id:_id});
-    let usedSeat = null;
-    let myUsedSeat =null;
-    let userId = global.piaoUserId || '';
- 
-    getUsedSeat.forEach(v=>{
-      if(v.user_id == userId){
-        //用户自己看的座位
-        myUsedSeat = [].concat(v.seat_id);
-      }else{
-        //其他用户看的座位
-        usedSeat = [].concat(v.seat_id);
-      } 
+    /**
+     * 1.查找此排期非自己下座位情况（即所售订单）
+     * 2.查找次排期自己是否有占座情况（即未完成订单）
+     * 3.返回座位情况
+     */
+    //1
+    const getUsedSeat = await orderListTable.find({session_id:_id},'seat_id status');
+    console.log(getUsedSeat);
+    
+    data.forEach(v=>{
+      getUsedSeat.forEach(item=>{
+        if(v._id == item._id){
+          v.status = item.status;
+        }
+      })
     })
-
-    if(usedSeat){
-      data.filter(v=>{
-        if(usedSeat.includes((v._id+''))){
-          v.seat_status = SEAT_STATUS[2];
-        }
-      })
-    }
-    if(myUsedSeat){
-      data.filter(v=>{
-        if(myUsedSeat.includes((v._id+''))){
-          v.seat_status = SEAT_STATUS[4];
-        }
-      })
-    }
 
     res.json({
       code: 0,
@@ -187,7 +174,7 @@ exports.getSeat = async (req, res, err) => {
       data: {
         seat:data,
         film_info:r,
-        mySeat:myUsedSeat
+        //mySeat:myUsedSeat
       }
     });
   })
