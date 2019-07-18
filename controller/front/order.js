@@ -2,6 +2,7 @@ const seatListTable = require("../../models/seat_list");
 const sessionListTable = require("../../models/session_list");
 const orderListTable = require("../../models/order_list");
 const cinemaListTable = require("../../models/cinema_list");
+const ticketsListTable = require("../../models/tickets_list");
 let { stampToTime, timeToStamp } = require('../../utils/index');
 let { parseToken } = require('../../utils/token');
 let qr = require('qr-image')
@@ -100,7 +101,6 @@ exports.placeOrder = async (req, res, next) => {
       } else {
         //创建订单
         orderListTable.create(createInfo, (err, data) => {
-          
           res.json({
             code: 0,
             msg: '创建订单成功',
