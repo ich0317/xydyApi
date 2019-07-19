@@ -4,7 +4,9 @@ const cinemaListTable = require("../../models/cinema_list");
 const sessionListTable = require("../../models/session_list");
 const seatListTable = require("../../models/seat_list");
 const orderListTable = require("../../models/order_list");
+const ticketsListTable = require("../../models/tickets_list");
 let { stampToTime } = require('../../utils/index');
+let { parseToken } = require("../../utils/token");
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
 const ORDER_STATUS = [0, 1, 2, 3];  //（0未支付、1已支付、2已退款、3已关闭）
 
@@ -143,27 +145,33 @@ exports.getLocationCollege = (req, res, next) => {
 //获取座位信息
 exports.getSeat = async (req, res, err) => {
   let { screen_id, _id } = req.query;
+  let getToken = req.headers["x-token"];
+  let { user_id, username } = parseToken(getToken, "b1234");
   const r = await sessionListTable.findOne({ _id }, 'film_name film_version start_datetime language' ,(err, data) => data);
+  //查此影厅座位图
   await seatListTable.find({
     $and: [
       { screen_id },
       { is_show: 1 }
     ]
-  },async (err, data) => {
+  }, async (err, data) => {
     if (err) return console.log(err);
     /**
      * 1.查找此排期非自己下座位情况（即所售订单）
      * 2.查找次排期自己是否有占座情况（即未完成订单）
      * 3.返回座位情况
      */
-    //1
-    const getUsedSeat = await orderListTable.find({session_id:_id},'seat_id status');
-    console.log(getUsedSeat);
-    
+    //1查此影厅排期座位状态
+    const getUsedSeat = await ticketsListTable.find({session_id:_id});
+
     data.forEach(v=>{
       getUsedSeat.forEach(item=>{
-        if(v._id == item._id){
-          v.status = item.status;
+        if(v._id == item.seat_id){
+          if(item.seat_status == SEAT_STATUS[2]){
+            item.user_id == (user_id) ? v.seat_status = SEAT_STATUS[4] : v.seat_status = item.seat_status;
+          }else{
+            v.seat_status = item.seat_status;
+          }
         }
       })
     })

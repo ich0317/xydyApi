@@ -38,7 +38,7 @@ app.all('/*', function(req, res, next){
   let { needLogin } = getMethod[req.method](req);
 
     //需要登录权限
-    if (req.headers.referer.indexOf('localhost:8082') != -1) {
+    if (req.headers.referer.indexOf('192.168.102.31:8082') != -1) {
 
       //前台
       if(needLogin){  //是否需要权限验证
