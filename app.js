@@ -5,6 +5,9 @@ const mongoose = require("mongoose"); //数据库
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
 
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
 app.use(
   bodyParser.urlencoded({
     limit: "50mb",
@@ -100,5 +103,12 @@ app.use('/api', routerApi);
 mongoose.connect("mongodb://localhost:27017/xydy", {
   useNewUrlParser: true
 });
-app.listen("8084"); //创建端口
+server.listen("8084"); //创建端口
 //删除no do
+
+// io.on('connection', function (socket) {  
+//   socket.emit('news', { hello: 'world2' });
+//   socket.on('my other event', function (data) {
+//     console.log(data);
+//   });
+// });

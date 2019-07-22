@@ -12,6 +12,6 @@ const tickets_list = new mongoose.Schema({
     default: null,
     type: String
   },
-  ticket_status: Number // 0未支付 1已售 2已退 3 不可售
+  ticket_status: Number // 0未支付 1已支付 2已退  3已取  4已检
 });
 module.exports = mongoose.model("tickets_list", tickets_list);

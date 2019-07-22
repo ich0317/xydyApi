@@ -46,6 +46,7 @@ router.get("/getFindDetail", news.getFindDetail);
 //新闻点赞
 router.post("/like", news.like);
 
+
 //登录
 router.post("/userLogin", user.userLogin);
 //注册

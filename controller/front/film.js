@@ -9,6 +9,7 @@ let { stampToTime } = require('../../utils/index');
 let { parseToken } = require("../../utils/token");
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
 const ORDER_STATUS = [0, 1, 2, 3];  //（0未支付、1已支付、2已退款、3已关闭）
+let userLng = null,userLat=null;
 
 //获取城市列表
 exports.getCityList = (req, res, next) => {
@@ -42,7 +43,11 @@ exports.getCinemaList = (req, res, next) => {
       res.json({
         code: 0,
         msg: "获取成功",
-        data: data
+        data: {
+          userLng,
+          userLat,
+          data
+        }
       });
     }
   });
@@ -105,6 +110,9 @@ exports.getLocationCollege = (req, res, next) => {
   let leftLongitude = 1 * lng - 0.012;
   let topLatitude = 1 * lat + 0.009;
   let bottomLatitude = 1 * lat - 0.009;
+
+  userLng = lng;
+  userLat = lat;
 
   cinemaListTable.findOne(
     {

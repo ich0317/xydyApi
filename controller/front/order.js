@@ -88,7 +88,7 @@ exports.placeOrder = async (req, res, next) => {
         let createInfo = {
           username,
           user_id, //用户id
-          order_num: Date.now(), //订单号
+          order_num: '' + parseInt(Date.now()/1000) + parseInt(10000+Math.random()*89999), //订单号
           session_id,
           seat, //座位
           serve_price, //服务费
@@ -120,6 +120,7 @@ exports.placeOrder = async (req, res, next) => {
             { _id: findOrder._id },
             createInfo,
             async (err, data) => {
+         
               res.json({
                 code: 0,
                 msg: "修改订单成功",
