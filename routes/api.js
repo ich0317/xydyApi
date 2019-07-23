@@ -5,6 +5,7 @@ const film = require('../controller/front/film');
 const order = require('../controller/front/order');
 const news = require('../controller/front/news');
 const user = require('../controller/front/user');
+const my = require('../controller/front/my');
 
 const cinemaManage = require('../controller/back/cinema_manage');
 const filmManage = require('../controller/back/film_manage');
@@ -45,6 +46,9 @@ router.get("/getFindNew", news.getFindNew);
 router.get("/getFindDetail", news.getFindDetail);
 //新闻点赞
 router.post("/like", news.like);
+
+//获取my相关信息
+router.get("/myInfo", my.myInfo);
 
 
 //登录

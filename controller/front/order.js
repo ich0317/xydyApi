@@ -7,6 +7,8 @@ let { stampToTime, timeToStamp } = require("../../utils/index");
 let { parseToken } = require("../../utils/token");
 let qr = require("qr-image");
 
+
+
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
 const SESSION_STATUS = [0, 1, 2, 3]; //状态 （0未审核 1已审核 2禁售 3完场）
 const ORDER_STATUS = [0, 1, 2, 3]; //（0未支付 1已支付 2已退款  3已关闭）
@@ -148,6 +150,9 @@ exports.placeOrder = async (req, res, next) => {
             ticketsListTable.insertMany(ticketInfo);
           });
         }
+
+        
+
       } else {
         //部分座位不可用
         res.json({
@@ -277,3 +282,5 @@ exports.getOrderList = (req, res, err) => {
       }
     });
 };
+
+

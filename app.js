@@ -4,9 +4,7 @@ const bodyParser = require("body-parser"); //交互
 const mongoose = require("mongoose"); //数据库
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
-
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+let { parseToken } = require("./utils/token");
 
 app.use(
   bodyParser.urlencoded({
@@ -20,7 +18,6 @@ app.use(
     limit: "50mb"
   })
 );
-
 
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 
@@ -51,7 +48,6 @@ app.all('/*', function(req, res, next){
           jwt.verify(getToken, 'b1234', function (err, decoded) {
 
             if (decoded) {
-              global.piaoUserId = decoded.user_id;
               next();
             } else {
 
@@ -103,12 +99,20 @@ app.use('/api', routerApi);
 mongoose.connect("mongodb://localhost:27017/xydy", {
   useNewUrlParser: true
 });
-server.listen("8084"); //创建端口
-//删除no do
 
-// io.on('connection', function (socket) {  
-//   socket.emit('news', { hello: 'world2' });
-//   socket.on('my other event', function (data) {
-//     console.log(data);
+// const orderListTable = require("./models/order_list");
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
+
+// io.on("connection", function(socket) {
+//   socket.emit("unpay", { hello: "world2" });
+//   socket.on("token", function(data) {
+//     let { user_id } = parseToken(data.token, "b1234");
+//     orderListTable.find({user_id,status:0},(err,data)=>{
+//       console.log(data);
+//     })
 //   });
 // });
+
+server.listen("8084"); //创建端口
+//删除no do

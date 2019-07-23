@@ -1,9 +1,6 @@
-const express = require('express');
-const app = express();
 const cinemaListTable = require("../../models/cinema_list");
 const sessionListTable = require("../../models/session_list");
 const seatListTable = require("../../models/seat_list");
-const orderListTable = require("../../models/order_list");
 const ticketsListTable = require("../../models/tickets_list");
 let { stampToTime } = require('../../utils/index');
 let { parseToken } = require("../../utils/token");
@@ -24,33 +21,60 @@ exports.getCityList = (req, res, next) => {
 }
 
 //获取影院列表
-exports.getCinemaList = (req, res, next) => {
+exports.getCinemaList = async (req, res, next) => {
 
-  cinemaListTable.find({
+  let getCinemaInfo = await cinemaListTable.find({
     city: {
       $regex: req.query.city
     }
-  }, (err, data) => {
-    if (err) return console.log(err);
-
-    if (data.length == 0) {
-      res.json({
-        code: 1,
-        msg: "暂未开通影院",
-        data: data
-      });
-    } else {
+  });
+  if(getCinemaInfo.length == 0){
+    res.json({
+      code: 1,
+      msg: "暂未开通影院"
+    });
+  }else{
+    let nowTime = stampToTime(Date.now() / 1000, 'YMDhm');
+    let getIds = getCinemaInfo.map(v=>v._id)
+    
+    sessionListTable.find({cinema_id:getIds, end_datetime: { $gt: nowTime }, status: 1},'sell_price cinema_id').exec((err,data)=>{
+      let jsonPrice = {};
+      
+      data.forEach(v=>{
+ 
+        if(!jsonPrice[v.cinema_id]){
+          jsonPrice[v.cinema_id] = v.sell_price;
+        }else{
+          if(v.sell_price < jsonPrice[v.cinema_id]){
+            jsonPrice[v.cinema_id] = v.sell_price;
+          }
+        }
+      })
+      
+      let newInfo = getCinemaInfo.map(v=>{
+        return {...v._doc}
+      })
+      newInfo.forEach(v=>{
+        for(let name in jsonPrice){
+          if(v._id == name){
+            v.min_price = jsonPrice[name];
+          }
+        }
+      })
       res.json({
         code: 0,
         msg: "获取成功",
         data: {
           userLng,
           userLat,
-          data
+          data:newInfo
         }
       });
-    }
-  });
+
+    });
+    
+  }
+  
 };
 
 //首页获取当前学校排期
