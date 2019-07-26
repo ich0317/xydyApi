@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser"); //交互
 const mongoose = require("mongoose"); //数据库
+const session = require('express-session')
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
 let { parseToken } = require("./utils/token");
@@ -18,6 +19,14 @@ app.use(
     limit: "50mb"
   })
 );
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: true,
+  name:'pos_coor_id',
+  saveUninitialized: true,
+  cookie: { maxAge :1000000 }
+}))
 
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 

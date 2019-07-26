@@ -5,6 +5,7 @@ const ticketsListTable = require("../../models/tickets_list");
 const userListTable = require("../../models/user");
 let { stampToTime, getDistance } = require("../../utils/index");
 let { parseToken } = require("../../utils/token");
+const session = require('express-session')
 const SEAT_STATUS = [0, 1, 2, 3, 4]; //（0 可售、1 已售、2 锁定、3 不可售、4 已选）
 const ORDER_STATUS = [0, 1, 2, 3]; //（0未支付、1已支付、2已退款、3已关闭）
 
@@ -23,6 +24,8 @@ exports.getCityList = (req, res, next) => {
 //获取影院列表
 exports.getCinemaList = async (req, res, next) => {
   let { lat, lng, city } = req.query;
+  let getToken = req.headers["x-token"];
+  let { user_id, username } = parseToken(getToken, "b1234");
   let getCinemaInfo = await cinemaListTable.find({
     city: {
       $regex: city
@@ -34,6 +37,7 @@ exports.getCinemaList = async (req, res, next) => {
       msg: "暂未开通影院"
     });
   } else {
+    //计算距离后的影院
     let sortCinema = getCinemaInfo
       .map(v => {
         return {
@@ -81,6 +85,21 @@ exports.getCinemaList = async (req, res, next) => {
           }
         });
 
+ 
+       let pos_coor_id = req.headers.cookie.split(';').filter(v=>{
+         if(v.indexOf('pos_coor_id') != -1){
+           let arr = v.split('=');
+           return arr[1]
+         }
+       })
+
+       if(lat){
+          req.session[pos_coor_id] = {
+            lat,
+            lng
+          }
+        }
+ 
         res.json({
           code: 0,
           msg: "获取成功",
@@ -88,6 +107,8 @@ exports.getCinemaList = async (req, res, next) => {
             data: sortCinema
           }
         });
+
+        
       });
   }
 };
