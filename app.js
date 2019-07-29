@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser"); //交互
 const mongoose = require("mongoose"); //数据库
 const session = require('express-session')
+const userListTable = require("./models/user");
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
 let { parseToken } = require("./utils/token");
@@ -20,13 +21,13 @@ app.use(
   })
 );
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: true,
-  name:'pos_coor_id',
-  saveUninitialized: true,
-  cookie: { maxAge :1000000 }
-}))
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: true,
+//   name:'pos_coor_id',
+//   saveUninitialized: true,
+//   cookie: { maxAge :1000000 }
+// }))
 
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 
@@ -47,17 +48,25 @@ app.all('/*', function(req, res, next){
   let { needLogin } = getMethod[req.method](req);
 
     //需要登录权限
-    if (req.headers.referer.indexOf('192.168.102.31:8082') != -1) {
+    if (req.headers.referer.indexOf('172.16.18.246:8082') != -1) {
 
       //前台
       if(needLogin){  //是否需要权限验证
         if (!!getToken) {
 
           //有token
-          jwt.verify(getToken, 'b1234', function (err, decoded) {
+          jwt.verify(getToken, 'b1234',async function (err, decoded) {
 
             if (decoded) {
-              next();
+              let hasUser = await userListTable.findById({_id:decoded.user_id});
+              if(hasUser){
+                next();
+              } else{
+                res.json({
+                  code: 20003,
+                  msg: '账户不存在'
+                });
+              }
             } else {
 
               res.json({

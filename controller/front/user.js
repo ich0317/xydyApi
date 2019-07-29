@@ -1,5 +1,6 @@
 const userListTable = require("../../models/user");
 let jwt = require('jsonwebtoken');
+let { stampToTime } = require("../../utils/index");
 
 //登录
 exports.userLogin = async (req, res, next) => {
@@ -36,7 +37,7 @@ exports.userReg = async (req, res, next) => {
       msg:'用户名已存在'
     });
   }else{
-    userListTable.create({username,password},(err,data)=>{
+    userListTable.create({username,password,reg_datetime:stampToTime(Date.now())},(err,data)=>{
       res.json({
         code:0,
         msg:'注册成功'

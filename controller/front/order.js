@@ -82,7 +82,7 @@ exports.placeOrder = async (req, res, next) => {
 
         findFilmInfo = Object.assign({}, findFilmInfo)._doc;
         delete findFilmInfo._id;
-        let serve_price = findServePrice.serve_price;
+        let serve_price = findServePrice.serve_price * seat_id.length;
         let total_price = findFilmInfo.sell_price * seat_id.length;
         let pay_price = total_price + serve_price * seat_id.length;
 
@@ -241,7 +241,7 @@ let timer = setInterval(() => {
       return serverTime - placeOrderTime > 0 && { _id: v._id };
     });
     if (expireOrder.length != 0) {
-      orderListTable.deleteMany({ _id: expireOrder }, (err, data) => {
+      orderListTable.updateMany({ _id: expireOrder },{status:ORDER_STATUS[3]}, (err, data) => {
         if (data) {
           //删除未支付订单的票
           let delCon = expireOrder.map(v => v._id);

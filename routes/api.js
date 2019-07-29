@@ -13,6 +13,8 @@ const loginManage = require('../controller/back/login');
 const planManage = require('../controller/back/plan');
 const screenManage = require('../controller/back/screen');
 const newsManage = require('../controller/back/news');
+const userManage = require('../controller/back/users');
+const orderManage = require('../controller/back/order');
 
 /**
  **** 前台api
@@ -62,14 +64,14 @@ router.post("/userReg", user.userReg);
 
 //登录
 router.post("/login", loginManage.login);
-//添加学校
-router.post("/addCollege", cinemaManage.addCollege);
-//搜索学校
-router.post("/searchCollege", cinemaManage.searchCollege);
-//获取学校
-router.get("/getCollege", cinemaManage.getCollege);
-//删除学校
-router.post("/delCollege", cinemaManage.delCollege);
+// //添加学校
+// router.post("/addCollege", cinemaManage.addCollege);
+// //搜索学校
+// router.post("/searchCollege", cinemaManage.searchCollege);
+// //获取学校
+// router.get("/getCollege", cinemaManage.getCollege);
+// //删除学校
+// router.post("/delCollege", cinemaManage.delCollege);
 /**
  * 影院管理
  */
@@ -81,16 +83,6 @@ router.get("/getCinema", cinemaManage.getCinema);
 router.get("/getCinemaDetail", cinemaManage.getCinemaDetail);
 //删除影院
 router.post("/delCinema", cinemaManage.delCinema);
-//添加影片
-router.post("/addFilm", filmManage.addFilm);
-//添加影片海报
-router.post("/upFilmPhoto", filmManage.upFilmPhoto);
-//获取影片列表
-router.post("/getFilmList", filmManage.getFilmList);
-//获取影片详情
-router.get("/getFilmDetail", filmManage.getFilmDetail);
-//删除影片
-router.post("/delFilm", filmManage.delFilm);
 //排期 搜索影片
 router.post("/searchFilm", planManage.searchFilm);
 //添加影厅
@@ -101,9 +93,6 @@ router.get("/getScreen", screenManage.getScreen);
 router.post("/addSeat", screenManage.addSeat);
 //获取座位
 router.post("/getSeat", screenManage.getSeat);
-/**
- * 添加排期栏目
- */
 //添加排期
 router.post("/addSession", planManage.addSession);
 //获取影厅和排期
@@ -112,6 +101,25 @@ router.get("/getScreenSession", planManage.getScreenSession);
 router.post("/delSession", planManage.delSession);
 //审核排期
 router.post("/agreeSession", planManage.agreeSession);
+/**
+ * 影片列表
+ */
+//添加影片
+router.post("/addFilm", filmManage.addFilm);
+//添加影片海报
+router.post("/upFilmPhoto", filmManage.upFilmPhoto);
+//获取影片列表
+router.post("/getFilmList", filmManage.getFilmList);
+//获取影片详情
+router.get("/getFilmDetail", filmManage.getFilmDetail);
+//删除影片
+router.post("/delFilm", filmManage.delFilm);
+/**
+ * 订单管理
+ */
+//获取用户订单
+router.get("/getOrder", orderManage.getOrder);
+
 /**
  * 新闻栏目
  */
@@ -125,5 +133,10 @@ router.get("/getNewsList", newsManage.getNewsList);
 router.get("/getNewsDetail", newsManage.getNewsDetail);
 //删除新闻
 router.post("/delNews", newsManage.delNews);
+/**
+ * 用户栏目
+ */
+//获取用户列表
+router.get("/getUserList", userManage.getUserList);
 
 module.exports = router;

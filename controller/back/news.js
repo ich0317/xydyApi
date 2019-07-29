@@ -1,6 +1,7 @@
 const newsListTable = require("../../models/news_list");
 const fs = require("fs");
 const multer = require("multer"); //express上传中间件
+let { parseToken } = require("../../utils/token");
 
 exports.upNewsPhoto = (req, res, next) => {
   let storage = multer.diskStorage({
@@ -74,6 +75,8 @@ exports.addNews = (req, res, next) => {
 //获取新闻列表
 exports.getNewsList = async (req, res, next) => {
   let { title, page = 1, page_size = 10 } = req.query;
+  let getToken = req.headers["x-token"];
+  let { username } = parseToken(getToken, "a1234");
   let n = (Number(page) - 1) * page_size;
   let searchCond = title ? {title:{'$regex':title}} : {};
 
@@ -93,11 +96,23 @@ exports.getNewsList = async (req, res, next) => {
         }
       });
     } else {
+      let newData = data.map(v=>{
+        return {
+          like:v.like,
+          release_date: v.release_date,
+          status: v.status,
+          title: v.title,
+          views: v.views,
+          _id: v._id,
+          username
+        }
+      })
+
       res.json({
         code: 0,
         msg: '获取成功',
         data:{
-          list:data,
+          list:newData,
           total:numAdventures
         }
       });
