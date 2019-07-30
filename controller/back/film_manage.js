@@ -74,7 +74,7 @@ exports.upFilmPhoto = (req, res, next) => {
       code: 0,
       msg: "上传成功",
       data: {
-        imgUrl: `${process.env.baseUrl}admin/${upPath}`
+        imgUrl: `${process.env.baseUrl}${upPath}`
       }
     });
   });
