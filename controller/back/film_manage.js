@@ -8,7 +8,7 @@ const multer = require("multer"); //express上传中间件
 
 //添加影片
 exports.addFilm = (req, res, next) => {
-  console.log(1111111)
+
   if (req.body._id) {
     //修改
     filmListTable.update({ _id: req.body._id }, req.body, (err, data) => {

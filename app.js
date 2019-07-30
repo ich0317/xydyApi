@@ -114,7 +114,7 @@ app.all('/*', function(req, res, next){
 
 app.use('/api', routerApi);
 
-mongoose.connect("mongodb://localhost:27017/xydy", {
+mongoose.connect("mongodb://148.70.228.18:22:27017/xydy", {
   useNewUrlParser: true
 });
 
