@@ -74,7 +74,7 @@ exports.upFilmPhoto = (req, res, next) => {
       code: 0,
       msg: "上传成功",
       data: {
-        imgUrl: `https://localhost:8084/${upPath}`
+        imgUrl: `http://localhost:8084/${upPath}`
       }
     });
   });
