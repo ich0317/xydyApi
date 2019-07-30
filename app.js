@@ -29,7 +29,7 @@ app.use(
 //   cookie: { maxAge :1000000 }
 // }))
 
-express.use(require('express').static(path.join(__dirname,"/uploads"))) //文件托管
+app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 
 //登录拦截
 app.all('/*', function(req, res, next){
