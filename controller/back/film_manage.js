@@ -40,7 +40,7 @@ exports.upFilmPhoto = (req, res, next) => {
       let oDate = new Date();
       let YM = oDate.getFullYear() + "-" + (oDate.getMonth() + 1);
       let getFileNam = fs.readdirSync("./uploads/film_photos/");
-
+      console.log(getFileNam.indexOf(YM));
       if (getFileNam.indexOf(YM) == -1) {
         fs.mkdir("./uploads/film_photos/" + YM, function(err) {
           //创建文件夹
@@ -54,6 +54,7 @@ exports.upFilmPhoto = (req, res, next) => {
     //给上传文件重命名，获取添加后缀名
     filename: function(req, file, cb) {
       let fileFormat = file.originalname.split(".");
+      console.log(fileFormat)
       cb(null, Date.now() + "." + fileFormat[fileFormat.length - 1]); //文件名为时间戳
     }
   });
