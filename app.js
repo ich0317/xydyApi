@@ -119,8 +119,8 @@ mongoose.connect("mongodb://localhost:27017/xydy", {
 });
 
 // const orderListTable = require("./models/order_list");
-const server = require("http").Server(app);
-const io = require("socket.io")(server);
+// const server = require("http").Server(app);
+// const io = require("socket.io")(server);
 
 // io.on("connection", function(socket) {
 //   socket.emit("unpay", { hello: "world2" });
@@ -132,5 +132,5 @@ const io = require("socket.io")(server);
 //   });
 // });
 
-server.listen("8084"); //创建端口
+app.listen("8084"); //创建端口
 //删除no do
