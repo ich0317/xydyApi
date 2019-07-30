@@ -28,7 +28,7 @@ app.use(
 //   saveUninitialized: true,
 //   cookie: { maxAge :1000000 }
 // }))
-
+console.log(__dirname);
 app.use('/uploads', express.static(__dirname + "/uploads")); //文件托管
 
 //登录拦截
