@@ -48,7 +48,68 @@ app.all('/*', function(req, res, next){
   let { needLogin } = getMethod[req.method](req);
 
     //需要登录权限
- 
+    if (req.headers.referer.indexOf('172.16.18.246:8082') != -1) {
+
+      //前台
+      if(needLogin){  //是否需要权限验证
+        if (!!getToken) {
+
+          //有token
+          jwt.verify(getToken, 'b1234',async function (err, decoded) {
+
+            if (decoded) {
+              let hasUser = await userListTable.findById({_id:decoded.user_id});
+              if(hasUser){
+                next();
+              } else{
+                res.json({
+                  code: 20003,
+                  msg: '账户不存在'
+                });
+              }
+            } else {
+
+              res.json({
+                code: 20003,
+                msg: '登录已过期'
+              });
+              
+            }
+            
+          });
+        } else {
+          if (getClientRouter.indexOf('/api/userLogin') != -1) {
+            next()
+          } else {
+            res.json({
+              code: 20003,
+              msg: '请先登录'
+            });
+          }
+        }
+      }else{
+        next();
+      }
+    } else {
+
+      //后台
+      if (!!getToken) {
+        jwt.verify(getToken, 'a1234', function (err, decoded) {
+
+          if (decoded) {
+            next();
+          } else {
+            res.json({
+              code: 20003,
+              'msg': '登录已过期'
+            });
+          }
+        });
+      } else {
+        next();
+      }
+    }
+
 })
 
 app.use('/api', routerApi);
