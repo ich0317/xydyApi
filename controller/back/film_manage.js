@@ -5,6 +5,7 @@ const mongoose = require("mongoose"); //数据库
 const filmListTable = require("../../models/film_list");
 const fs = require("fs");
 const multer = require("multer"); //express上传中间件
+require('../../env.js');
 
 //添加影片
 exports.addFilm = (req, res, next) => {
@@ -42,7 +43,7 @@ exports.upFilmPhoto = (req, res, next) => {
       let oDate = new Date();
       let YM = oDate.getFullYear() + "-" + (oDate.getMonth() + 1);
       let getFileNam = fs.readdirSync("./uploads/film_photos/");
-      console.log(getFileNam.indexOf(YM));
+      
       if (getFileNam.indexOf(YM) == -1) {
         fs.mkdir("./uploads/film_photos/" + YM, function(err) {
           //创建文件夹
@@ -56,7 +57,7 @@ exports.upFilmPhoto = (req, res, next) => {
     //给上传文件重命名，获取添加后缀名
     filename: function(req, file, cb) {
       let fileFormat = file.originalname.split(".");
-      console.log(fileFormat)
+      
       cb(null, Date.now() + "." + fileFormat[fileFormat.length - 1]); //文件名为时间戳
     }
   });
@@ -68,11 +69,13 @@ exports.upFilmPhoto = (req, res, next) => {
   upload(req, res, function(err) {
     if (err) return console.error(err);
     let upPath = req.file.path.replace(/\\\+/g, "/");
+    console.log(process.env.baseUrl);
+    console.log(upPath);
     res.json({
       code: 0,
       msg: "上传成功",
       data: {
-        imgUrl: `http://${req.headers.host}/${upPath}`
+        imgUrl: `${process.env.baseUrl}${upPath}`
       }
     });
   });
