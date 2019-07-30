@@ -1,1 +1,1 @@
-process.env.baseUrl = 'http://localhost:8084/';
+process.env.baseUrl = 'https://www.ichang.xyz/';
