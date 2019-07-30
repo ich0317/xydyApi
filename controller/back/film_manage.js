@@ -33,6 +33,7 @@ exports.addFilm = (req, res, next) => {
 
 //影片图片上传
 exports.upFilmPhoto = (req, res, next) => {
+  console.log(1111111)
   let storage = multer.diskStorage({
     //设置上传后文件路径，uploads文件夹会自动创建。
     destination: function(req, file, cb) {
