@@ -56,7 +56,7 @@ app.all('/*', function(req, res, next){
 
           //有token
           jwt.verify(getToken, 'b1234',async function (err, decoded) {
-
+console.log(decoded);
             if (decoded) {
               let hasUser = await userListTable.findById({_id:decoded.user_id});
               if(hasUser){
