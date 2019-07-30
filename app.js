@@ -46,7 +46,7 @@ app.all('/*', function(req, res, next){
     }
   };
   let { needLogin } = getMethod[req.method](req);
-
+console.log(req.headers.referer);
     //需要登录权限
     if (req.headers.referer.indexOf('172.16.18.246:8082') != -1) {
 
