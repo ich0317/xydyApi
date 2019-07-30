@@ -46,9 +46,9 @@ app.all('/*', function(req, res, next){
     }
   };
   let { needLogin } = getMethod[req.method](req);
-console.log(req.headers.referer);
+
     //需要登录权限
-    if (req.headers.referer.indexOf('172.16.18.246:8082') != -1) {
+    if (req.headers.referer.indexOf('https://148.70.228.18/admin/') == -1) {
 
       //前台
       if(needLogin){  //是否需要权限验证
