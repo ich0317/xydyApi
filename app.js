@@ -95,7 +95,7 @@ console.log(decoded);
       //后台
       if (!!getToken) {
         jwt.verify(getToken, 'a1234', function (err, decoded) {
-
+          console.log(decoded);
           if (decoded) {
             next();
           } else {
