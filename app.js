@@ -117,7 +117,7 @@ app.use('/api', routerApi);
 mongoose.connect("mongodb://localhost:27017/xydy", {
   useNewUrlParser: true
 });
-console.log(2222)
+
 // const orderListTable = require("./models/order_list");
 // const server = require("http").Server(app);
 // const io = require("socket.io")(server);
