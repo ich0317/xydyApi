@@ -4,7 +4,6 @@ let user_name = null;
 //登录
 exports.login = (req, res, next) => {
     let { username, password } = req.body;
-    console.log(username);
     adminUserTable.find({ username, password }, (err, data) => {
         if (err) return console.log(err);
         if (data.length == 0) {
