@@ -84,7 +84,7 @@ exports.placeOrder = async (req, res, next) => {
         delete findFilmInfo._id;
         let serve_price = findServePrice.serve_price * seat_id.length;
         let total_price = findFilmInfo.sell_price * seat_id.length;
-        let pay_price = total_price + serve_price * seat_id.length;
+        let pay_price = total_price + serve_price;
 
         //5
         let createInfo = {

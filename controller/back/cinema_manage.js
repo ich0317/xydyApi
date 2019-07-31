@@ -161,15 +161,28 @@ exports.addCinema = async (req, res, next) => {
 
 //获取影院列表
 exports.getCinema = async (req, res, next) => {
-    let { page = 1, page_size = 10 } = req.query;
-    //let queryCond = college_name ? { 'college_name': { '$regex': college_name } } : {};
+    let { page = 1, page_size = 10, city, searchName } = req.query;
+    let queryCond = {};
+    let $and = [];
+    if(searchName){
+        $and.push({cinema_name:{ '$regex': searchName }}); 
+    }
+    if(city){
+        $and.push({province:{ '$regex': city[0] }},{city:{ '$regex': city[1] }}); 
+    }
+
+    if($and.length != 0){
+        queryCond.$and = $and;
+    }
+
+    console.log(queryCond);
 
     let n = (Number(page) - 1) * page_size;
     let numAdventures = await cinemaListTable.estimatedDocumentCount({}, (err, length) => {
         return length;
     });
 
-    await cinemaListTable.find({}).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, data) => {
+    await cinemaListTable.find(queryCond).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, data) => {
         if (err) return console.log(err);
         if (data.length == 0) {
             res.json({
