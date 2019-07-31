@@ -122,7 +122,8 @@ app.all('/*', function(req, res, next){
 })
 
 app.use('/api', routerApi);
-mongoose.connect(`mongodb://148.70.228.18:27017/xydy`, {
+
+mongoose.connect('mongodb://148.70.228.18:27017/xydy', {
   useNewUrlParser: true
 });
 
@@ -139,7 +140,7 @@ mongoose.connect(`mongodb://148.70.228.18:27017/xydy`, {
 //     })
 //   });
 // });
-
+console.log(process.env.PORT);
 app.listen(process.env.PORT); //创建端口
 
 //删除no do
