@@ -56,7 +56,7 @@ app.all('/*', function(req, res, next){
 
           //有token
           jwt.verify(getToken, 'b1234',async function (err, decoded) {
-console.log(decoded);
+
             if (decoded) {
               let hasUser = await userListTable.findById({_id:decoded.user_id});
               if(hasUser){
@@ -114,7 +114,7 @@ console.log(decoded);
 
 app.use('/api', routerApi);
 
-mongoose.connect("mongodb://148.70.228.18:22:27017/xydy", {
+mongoose.connect("mongodb://localhost:27017/xydy", {
   useNewUrlParser: true
 });
 
@@ -133,4 +133,5 @@ mongoose.connect("mongodb://148.70.228.18:22:27017/xydy", {
 // });
 
 app.listen("8084"); //创建端口
+console.log(process.env.NODE_ENV);
 //删除no do

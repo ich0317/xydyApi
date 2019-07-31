@@ -72,6 +72,7 @@ exports.addNews = (req, res, next) => {
 
 }
 
+
 //获取新闻列表
 exports.getNewsList = async (req, res, next) => {
   let { title, page = 1, page_size = 10 } = req.query;
