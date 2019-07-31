@@ -5,7 +5,6 @@ const mongoose = require("mongoose"); //数据库
 const filmListTable = require("../../models/film_list");
 const fs = require("fs");
 const multer = require("multer"); //express上传中间件
-require('../../env.js');
 
 //添加影片
 exports.addFilm = (req, res, next) => {
@@ -69,12 +68,12 @@ exports.upFilmPhoto = (req, res, next) => {
   upload(req, res, function(err) {
     if (err) return console.error(err);
     let upPath = req.file.path.replace(/\\\+/g, "/");
-    console.log(process.env.baseUrl);
+    console.log(process.env.BASE_URL);
     res.json({
       code: 0,
       msg: "上传成功",
       data: {
-        imgUrl: `${process.env.baseUrl}${upPath}`
+        imgUrl: `${process.env.BASE_URL}/${upPath}`
       }
     });
   });

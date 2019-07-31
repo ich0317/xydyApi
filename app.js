@@ -9,7 +9,6 @@ let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
 let { parseToken } = require("./utils/token");
 
-
 app.use(
   bodyParser.urlencoded({
     limit: "50mb",
@@ -48,7 +47,7 @@ app.all('/*', function(req, res, next){
     }
   };
   let { needLogin } = getMethod[req.method](req);
-  
+
   let flag = null;
   if(process.env.NODE_ENV == 'development'){
     flag =`${process.env.BASE_URL}:9528`;
