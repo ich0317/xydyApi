@@ -68,7 +68,6 @@ exports.upFilmPhoto = (req, res, next) => {
   upload(req, res, function(err) {
     if (err) return console.error(err);
     let upPath = req.file.path.replace(/\\\+/g, "/");
-    console.log(process.env.BASE_URL);
     res.json({
       code: 0,
       msg: "上传成功",
