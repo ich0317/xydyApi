@@ -1,3 +1,4 @@
+require('./config');
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser"); //交互
@@ -7,6 +8,7 @@ const userListTable = require("./models/user");
 let jwt = require('jsonwebtoken');
 let routerApi = require("./routes/api");
 let { parseToken } = require("./utils/token");
+
 
 app.use(
   bodyParser.urlencoded({
@@ -46,9 +48,17 @@ app.all('/*', function(req, res, next){
     }
   };
   let { needLogin } = getMethod[req.method](req);
+  
+  let flag = null;
+  if(process.env.NODE_ENV == 'development'){
+    flag =`${process.env.BASE_URL}:9528`;
+  }
+  if(process.env.NODE_ENV == 'production'){
+    flag =`${process.env.BASE_URL}/admin`;
+  }
 
     //需要登录权限
-    if (req.headers.referer.indexOf('https://148.70.228.18/admin/') == -1) {
+    if (req.headers.host.indexOf(flag) == -1) {
 
       //前台
       if(needLogin){  //是否需要权限验证
@@ -95,7 +105,7 @@ app.all('/*', function(req, res, next){
       //后台
       if (!!getToken) {
         jwt.verify(getToken, 'a1234', function (err, decoded) {
-          console.log(decoded);
+       
           if (decoded) {
             next();
           } else {
@@ -114,7 +124,7 @@ app.all('/*', function(req, res, next){
 
 app.use('/api', routerApi);
 
-mongoose.connect("mongodb://localhost:27017/xydy", {
+mongoose.connect(`mongodb://${process.env.BASE_URL}:27017/xydy`, {
   useNewUrlParser: true
 });
 
@@ -132,6 +142,6 @@ mongoose.connect("mongodb://localhost:27017/xydy", {
 //   });
 // });
 
-app.listen("8084"); //创建端口
-console.log(process.env.NODE_ENV);
+app.listen(process.env.PORT); //创建端口
+
 //删除no do
