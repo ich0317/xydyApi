@@ -122,8 +122,7 @@ app.all('/*', function(req, res, next){
 })
 
 app.use('/api', routerApi);
-console.log(process.env.BASE_URL);
-mongoose.connect(`mongodb://${process.env.BASE_URL}:27017/xydy`, {
+mongoose.connect(`mongodb://148.70.228.18:27017/xydy`, {
   useNewUrlParser: true
 });
 
