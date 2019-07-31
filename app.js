@@ -122,7 +122,7 @@ app.all('/*', function(req, res, next){
 })
 
 app.use('/api', routerApi);
-mongoose.connect(`mongodb://${process.env.BASE_URL}:27017/xydy`, {
+mongoose.connect(`mongodb://${process.env.IP}:27017/xydy`, {
   useNewUrlParser: true
 });
 
