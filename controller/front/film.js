@@ -38,19 +38,35 @@ exports.getCinemaList = async (req, res, next) => {
     //计算距离后的影院
     let sortCinema = getCinemaInfo
       .map(v => {
-        return {
-          _id: v._id,
-          cinema_name: v.cinema_name,
-          address: v.address,
-          serve_price: v.serve_price,
-          stop_sale: v.stop_sale,
-          status: v.status,
-          province: v.province,
-          city: v.city,
-          lat: v.lat,
-          lng: v.lng,
-          dis: getDistance(lat, lng, v.lat, v.lng)
-        };
+        if(lat && lng){
+          return {
+            _id: v._id,
+            cinema_name: v.cinema_name,
+            address: v.address,
+            serve_price: v.serve_price,
+            stop_sale: v.stop_sale,
+            status: v.status,
+            province: v.province,
+            city: v.city,
+            lat: v.lat,
+            lng: v.lng,
+            dis: getDistance(lat, lng, v.lat, v.lng)
+          };
+        }else{
+          return {
+            _id: v._id,
+            cinema_name: v.cinema_name,
+            address: v.address,
+            serve_price: v.serve_price,
+            stop_sale: v.stop_sale,
+            status: v.status,
+            province: v.province,
+            city: v.city,
+            lat: v.lat,
+            lng: v.lng,
+            dis: null
+          };
+        }
       })
       .sort((a, b) => a.dis - b.dis);
 
