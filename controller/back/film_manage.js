@@ -5,7 +5,30 @@ const mongoose = require("mongoose"); //数据库
 const filmListTable = require("../../models/film_list");
 const fs = require("fs");
 const multer = require("multer"); //express上传中间件
+let https = require('https');
+let path = require('path');
+let cheerio = require('cheerio');
+let a = '银河补习班'
+https.get("https://movie.douban.com/subject/30282387/", function (res) {
+	let getData = '';
+  // 获取页面数据
+  
+	res.on('data', function (data) {
+		getData += data;
 
+  });
+  
+	// 数据获取结束
+	res.on('end', function () {
+    let $ = cheerio.load(getData);
+    console.log($('#info').html());
+    
+		//res.json(result_1535094938595)
+  });
+
+}).on('error', function () {
+	console.log('获取数据出错！');
+});
 //添加影片
 exports.addFilm = (req, res, next) => {
 
