@@ -64,14 +64,6 @@ router.post("/userReg", user.userReg);
 
 //登录
 router.post("/login", loginManage.login);
-// //添加学校
-// router.post("/addCollege", cinemaManage.addCollege);
-// //搜索学校
-// router.post("/searchCollege", cinemaManage.searchCollege);
-// //获取学校
-// router.get("/getCollege", cinemaManage.getCollege);
-// //删除学校
-// router.post("/delCollege", cinemaManage.delCollege);
 /**
  * 影院管理
  */
@@ -114,6 +106,8 @@ router.post("/getFilmList", filmManage.getFilmList);
 router.get("/getFilmDetail", filmManage.getFilmDetail);
 //删除影片
 router.post("/delFilm", filmManage.delFilm);
+//抓取电影信息
+router.get("/getdbFilm", filmManage.getdbFilm);
 /**
  * 订单管理
  */

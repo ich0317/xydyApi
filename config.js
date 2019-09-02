@@ -1,7 +1,7 @@
 if (process.env.npm_lifecycle_event == 'dev'){
     process.env.NODE_ENV = 'development';
     process.env.PORT = 8084;
-    process.env.BASE_URL = 'localhost';
+    process.env.BASE_URL = 'http://localhost';
     process.env.IP = 'localhost';
   }else{
     process.env.NODE_ENV = 'production';

@@ -142,5 +142,3 @@ mongoose.connect(`mongodb://${process.env.IP}:27017/xydy`, {
 // });
 
 app.listen(process.env.PORT); //创建端口
-
-//删除no do

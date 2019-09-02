@@ -5,36 +5,15 @@ const mongoose = require("mongoose"); //数据库
 const filmListTable = require("../../models/film_list");
 const fs = require("fs");
 const multer = require("multer"); //express上传中间件
-let https = require('https');
-let path = require('path');
-let cheerio = require('cheerio');
-let a = '银河补习班'
-https.get("https://movie.douban.com/subject/30282387/", function (res) {
-	let getData = '';
-  // 获取页面数据
-  
-	res.on('data', function (data) {
-		getData += data;
+let https = require("https");
+let path = require("path");
+let cheerio = require("cheerio");
 
-  });
-  
-	// 数据获取结束
-	res.on('end', function () {
-    let $ = cheerio.load(getData);
-    console.log($('#info').html());
-    
-		//res.json(result_1535094938595)
-  });
-
-}).on('error', function () {
-	console.log('获取数据出错！');
-});
 //添加影片
-exports.addFilm = (req, res, next) => {
-
+exports.addFilm = async (req, res, next) => {
   if (req.body._id) {
     //修改
-    filmListTable.update({ _id: req.body._id }, req.body, (err, data) => {
+    filmListTable.updateOne({ _id: req.body._id }, req.body, (err, data) => {
       if (err) console.log(err);
       res.json({
         code: 0,
@@ -44,6 +23,18 @@ exports.addFilm = (req, res, next) => {
     });
   } else {
     //新增
+    const r = await filmListTable.findOne(
+      { film_name: req.body.film_name },
+      (err, data) => data
+    );
+    //重复验证
+    if (r) {
+      res.json({
+        code: -1,
+        msg: "影片已存在"
+      });
+      return;
+    }
     filmListTable.create(req.body, (err, data) => {
       if (err) console.log(err);
       res.json({
@@ -57,7 +48,6 @@ exports.addFilm = (req, res, next) => {
 
 //影片图片上传
 exports.upFilmPhoto = (req, res, next) => {
-  
   let storage = multer.diskStorage({
     //设置上传后文件路径，uploads文件夹会自动创建。
     destination: function(req, file, cb) {
@@ -65,7 +55,7 @@ exports.upFilmPhoto = (req, res, next) => {
       let oDate = new Date();
       let YM = oDate.getFullYear() + "-" + (oDate.getMonth() + 1);
       let getFileNam = fs.readdirSync("./uploads/film_photos/");
-      
+
       if (getFileNam.indexOf(YM) == -1) {
         fs.mkdir("./uploads/film_photos/" + YM, function(err) {
           //创建文件夹
@@ -79,7 +69,7 @@ exports.upFilmPhoto = (req, res, next) => {
     //给上传文件重命名，获取添加后缀名
     filename: function(req, file, cb) {
       let fileFormat = file.originalname.split(".");
-      
+
       cb(null, Date.now() + "." + fileFormat[fileFormat.length - 1]); //文件名为时间戳
     }
   });
@@ -95,7 +85,7 @@ exports.upFilmPhoto = (req, res, next) => {
       code: 0,
       msg: "上传成功",
       data: {
-        imgUrl: `${process.env.BASE_URL}/${upPath}`
+        imgUrl: `${process.env.BASE_URL}:${process.env.PORT}/${upPath}`
       }
     });
   });
@@ -120,41 +110,49 @@ exports.getFilmList = async (req, res, next) => {
     });
   }
 
-  let n = (Number(page)-1)*page_size;
-  let numAdventures = await filmListTable.estimatedDocumentCount({},(err,length)=>{
+  let n = (Number(page) - 1) * page_size;
+  let numAdventures = await filmListTable.estimatedDocumentCount(
+    {},
+    (err, length) => {
       return length;
-  });
+    }
+  );
 
   if (!!condArr.length) {
     //有条件
     getCond = { $and: condArr };
   }
 
-  filmListTable.find(getCond).skip(n).limit(Number(page_size)).sort({ _id: -1 }).exec((err, data) => {
-    if (err) return console.log(err);
-    if(!!condArr.length){
+  filmListTable
+    .find(getCond)
+    .skip(n)
+    .limit(Number(page_size))
+    .sort({ _id: -1 })
+    .exec((err, data) => {
+      if (err) return console.log(err);
+      if (!!condArr.length) {
         numAdventures = data.length;
-    }
-    if (data.length == 0) {
-      res.json({
-        code: 1,
-        msg: "暂无数据",
-        data:{
-          film:data,
-          total:numAdventures
-        }
-      });
-    } else {
-      res.json({
-        code: 0,
-        msg: "获取成功",
-        data:{
-          film:data,
-          total:numAdventures
-        }
-      });
-    }
-  });
+      }
+      if (data.length == 0) {
+        res.json({
+          code: 1,
+          msg: "暂无数据",
+          data: {
+            film: data,
+            total: numAdventures
+          }
+        });
+      } else {
+        res.json({
+          code: 0,
+          msg: "获取成功",
+          data: {
+            film: data,
+            total: numAdventures
+          }
+        });
+      }
+    });
 };
 
 //获取影片详情
@@ -178,11 +176,168 @@ exports.getFilmDetail = (req, res, next) => {
 
 //删除影片
 exports.delFilm = (req, res, next) => {
-  filmListTable.remove(req.body, (err, data) => {
+  filmListTable.deleteOne(req.body, (err, data) => {
     res.json({
       code: 0,
       msg: "删除成功",
       data
     });
   });
+};
+
+//抓取电影信息
+exports.getdbFilm = (req, res, next) => {
+  let { film_name } = req.query;
+  let filmName = film_name;
+  https
+    .get(
+      `https://movie.douban.com/j/subject_suggest?q=${encodeURI(filmName)}`,
+      suc1 => {
+        let getData = "";
+        suc1.on("data", function(data) {
+          getData += data;
+        });
+        suc1.on("end", () => {
+          if (JSON.parse(getData).length === 0) {
+            res.json({
+              code: -1,
+              msg: "暂无影片"
+            });
+            return;
+          }
+          let filmId = JSON.parse(getData)[0].id;
+          if (filmId) {
+            https
+              .get(`https://movie.douban.com/subject/${filmId}/`, suc2 => {
+                let getData2 = "";
+                suc2.on("data", function(data) {
+                  getData2 += data;
+                });
+
+                suc2.on("end", function() {
+                  let $ = cheerio.load(getData2);
+                  let oHtml = $("#info")
+                    .html()
+                    .replace(/\s+/g, "");
+                  let oHtmlArr = oHtml.split("<br>");
+                  let film_type = "";
+                  let release_date = "";
+                  let film_long = "";
+                  for (let i = 0; i < $("#info span").length; i++) {
+                    let iSpan = $("#info span").eq(i);
+                    if (iSpan.attr("property") === "v:genre") {
+                      film_type += iSpan.text() + "/";
+                    }
+                    if (
+                      iSpan.attr("property") === "v:initialReleaseDate" &&
+                      iSpan.attr("content").indexOf("中国大陆") != -1
+                    ) {
+                      release_date = iSpan
+                        .attr("content")
+                        .replace(/\(中国大陆\)/, "");
+                    }
+
+                    if (iSpan.attr("property") === "v:runtime") {
+                      film_long = iSpan.attr("content");
+                    }
+                  }
+                  let country = "";
+                  let language = "";
+                  let alias = "";
+                  oHtmlArr.forEach(v => {
+                    if (
+                      v.indexOf(
+                        "&#x5236;&#x7247;&#x56FD;&#x5BB6;/&#x5730;&#x533A;"
+                      ) !== -1
+                    ) {
+                      country = unescape(
+                        v
+                          .replace(
+                            /<spanclass="pl">&#x5236;&#x7247;&#x56FD;&#x5BB6;\/&#x5730;&#x533A;:<\/span>/,
+                            ""
+                          )
+                          .replace(/&#x/g, "%u")
+                          .replace(/;/g, "")
+                          .replace(/%uA0/g, " ")
+                      );
+                    }
+                    if (v.indexOf("&#x8BED;&#x8A00;") !== -1) {
+                      language = unescape(
+                        v
+                          .replace(
+                            /<spanclass="pl">&#x8BED;&#x8A00;:<\/span>/,
+                            ""
+                          )
+                          .replace(/&#x/g, "%u")
+                          .replace(/;/g, "")
+                          .replace(/%uA0/g, " ")
+                      );
+                    }
+                    if (v.indexOf("&#x53C8;&#x540D;") !== -1) {
+                      alias = unescape(
+                        v
+                          .replace(
+                            /<spanclass="pl">&#x53C8;&#x540D;:<\/span>/,
+                            ""
+                          )
+                          .replace(/&#x/g, "%u")
+                          .replace(/;/g, "")
+                          .replace(/%uA0/g, " ")
+                      );
+                    }
+                  });
+                  let info = {
+                    director: $("#info span")
+                      .eq(0)
+                      .find(".attrs")
+                      .text()
+                      .replace(/\s/g, ""),
+                    screenwriter: $("#info span")
+                      .eq(0)
+                      .siblings("span")
+                      .find(".attrs")
+                      .text(),
+                    actors: $("#info .actor")
+                      .find(".attrs")
+                      .text()
+                      .replace(/\s/g, ""),
+                    film_type: film_type.replace(/\/$/, ""),
+                    country,
+                    language,
+                    release_date,
+                    film_long,
+                    alias,
+                    film_photo: JSON.parse(getData)[0].img,
+                    film_name: filmName,
+                    brief: $("#link-report")
+                      .text()
+                      .replace(/\s/g, ""),
+                    film_version: []
+                  };
+
+                  res.json({
+                    code: 0,
+                    msg: "获取成功",
+                    data: info
+                  });
+                });
+              })
+              .on("error", function() {
+                console.log("获取数据出错2！");
+                res.json({
+                  code: -1,
+                  msg: "获取失败"
+                });
+              });
+          }
+        });
+      }
+    )
+    .on("error", function() {
+      console.log("获取数据出错1！");
+      res.json({
+        code: -1,
+        msg: "获取失败"
+      });
+    });
 };
