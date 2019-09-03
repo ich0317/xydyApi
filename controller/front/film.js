@@ -24,11 +24,16 @@ exports.getCityList = (req, res, next) => {
 //获取影院列表
 exports.getCinemaList = async (req, res, next) => {
   let { lat, lng, city } = req.query;
-  let getCinemaInfo = await cinemaListTable.find({
-    city: {
-      $regex: city
+  let getCinemaInfo = await cinemaListTable.find({$and:[
+    {
+      city: {
+        $regex: city
+      }
+    },
+    {
+      status:true
     }
-  });
+  ]});
   if (getCinemaInfo.length == 0) {
     res.json({
       code: 1,
@@ -119,7 +124,10 @@ exports.getIndexFilmList = async (req, res, next) => {
   //获取影院
   let r =
     (await cinemaListTable.findOne(
-      { _id: cinema_id },
+      { $and:[
+        { _id: cinema_id },
+        { status: true }
+      ] },
       "cinema_name address"
     )) || [];
 

@@ -61,7 +61,7 @@ exports.getOrder = async (req, res, next) => {
   orderListTable
     .find(
       searchCond,
-      "order_num film_name cinema_name screen_name total_price serve_price order_datetime status pay_price username seat"
+      "order_num film_name cinema_name total_price serve_price order_datetime status pay_price username seat"
     )
     .skip(n)
     .limit(Number(page_size))
@@ -83,14 +83,14 @@ exports.getOrder = async (req, res, next) => {
             order_num:v.order_num,
             film_name:v.film_name,
             cinema_name:v.cinema_name,
-            screen_name:v.screen_name,
             total_price:v.total_price,
             serve_price:v.serve_price,
             order_datetime:v.order_datetime,
             status:v.status,
             pay_price:v.pay_price,
             username:v.username,
-            seat:v.seat
+            seat:v.seat,
+            _id:v._id
           }
         })
         res.json({
@@ -104,3 +104,22 @@ exports.getOrder = async (req, res, next) => {
       }
     });
 };
+
+//获取订单详情
+exports.getOrderDetail = (req, res, next) => {
+  let { order_id } = req.query;
+  orderListTable.findOne({_id:order_id}, (err,data)=>{
+    if(!data){
+      res.json({
+        code: 1,
+        msg: "暂无数据"
+      });
+      return;
+    }
+    res.json({
+      code: 0,
+      msg: "获取成功",
+      data
+    });
+  });
+}

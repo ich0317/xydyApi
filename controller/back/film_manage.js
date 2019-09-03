@@ -205,6 +205,7 @@ exports.getdbFilm = (req, res, next) => {
             });
             return;
           }
+
           let filmId = JSON.parse(getData)[0].id;
           if (filmId) {
             https
@@ -307,12 +308,9 @@ exports.getdbFilm = (req, res, next) => {
                     release_date,
                     film_long,
                     alias,
-                    film_photo: JSON.parse(getData)[0].img,
-                    film_name: filmName,
-                    brief: $("#link-report")
-                      .text()
-                      .replace(/\s/g, ""),
-                    film_version: []
+                    //film_photo: JSON.parse(getData)[0].img,
+                    film_name: JSON.parse(getData)[0].title,
+                    brief: $("#link-report").text().replace(/\s/g, "")
                   };
 
                   res.json({

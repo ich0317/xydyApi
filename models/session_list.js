@@ -15,7 +15,7 @@ const sessionList = new mongoose.Schema({
     start_datetime:String,    //开场日期时间
     end_datetime:String,     //结束日期时间
     screen_name:String,  //影厅名称
-    sell_price:Number,   //票价
+    sell_price:String,   //票价
     cinema_id:String,    //所属影院id
     screen_id:String,    //所属影厅id
     film_id:String,  //影片id

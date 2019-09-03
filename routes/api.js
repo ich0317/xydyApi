@@ -113,6 +113,8 @@ router.get("/getdbFilm", filmManage.getdbFilm);
  */
 //获取用户订单
 router.get("/getOrder", orderManage.getOrder);
+//获取订单详情
+router.get("/getOrderDetail", orderManage.getOrderDetail);
 
 /**
  * 新闻栏目

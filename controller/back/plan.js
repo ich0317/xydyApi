@@ -38,7 +38,7 @@ exports.addSession = async (req, res, next) => {
   }else{
     //新增
     //const copySeatMap = await seatListTable.find({screen_id},(err,data)=>data);
-    sessionListTable.create({...req.body},(err,data)=>{
+    sessionListTable.create(req.body,(err,data)=>{
       if (err) return console.log(err);
       res.json({
         code:0,
